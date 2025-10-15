@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+require("hardhat-gas-reporter");
 
 const { PRIVATE_KEY, BSCSCAN_API_KEY, ETHERSCAN_API_KEY, SEPOLIA_RPC_URL } = process.env;
 
@@ -88,6 +89,7 @@ module.exports = {
     gasReporter: {
         enabled: process.env.REPORT_GAS === "true",
         currency: "USD",
+         token: "BNB", // 💡 Quan trọng: báo cáo gas theo giá BNB thay vì ETH
         coinmarketcap: process.env.COINMARKETCAP_API_KEY || "",
         outputFile: "gas-report.txt",
         noColors: true,
