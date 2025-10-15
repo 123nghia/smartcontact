@@ -1,29 +1,102 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
-const { PRIVATE_KEY, BSCSCAN_API_KEY, SEPOLIA_RPC_URL, SEPOLIA_PRIVATE_KEY } = process.env;
+const { PRIVATE_KEY, BSCSCAN_API_KEY, ETHERSCAN_API_KEY, SEPOLIA_RPC_URL } = process.env;
 
 module.exports = {
-  solidity: {
-    version: "0.8.28",
-    settings: {
-      optimizer: { enabled: true, runs: 200 },
-       evmVersion: "london", // ✅ fix lỗi "paris" khi chạy devnet
+    solidity: {
+        version: "0.8.28",
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 200,
+            },
+            evmVersion: "london",
+        },
     },
-  },
-  networks: {
-    hardhat: {
-      chainId: 31337,
-    },
-    localhost: {
-      url: "http://127.0.0.1:8545",
-    }
     
-  },
-  etherscan: {
-    apiKey: {
-      sepolia: process.env.ETHERSCAN_API_KEY || "",
-      bscTestnet: BSCSCAN_API_KEY || "",
+    networks: {
+        // Local development
+        hardhat: {
+            chainId: 31337,
+        },
+        localhost: {
+            url: "http://127.0.0.1:8545",
+            chainId: 31337,
+        },
+        
+        // Ethereum Sepolia Testnet
+        sepolia: {
+            url: SEPOLIA_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/demo",
+            accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+            chainId: 11155111,
+        },
+        
+        // BSC Testnet
+        bscTestnet: {
+            url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+            accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+            chainId: 97,
+        },
+        
+        // BSC Mainnet (uncomment when ready)
+        // bsc: {
+        //     url: "https://bsc-dataseed1.binance.org",
+        //     accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+        //     chainId: 56,
+        // },
+        
+        // Ethereum Mainnet (uncomment when ready)
+        // mainnet: {
+        //     url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
+        //     accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+        //     chainId: 1,
+        // },
     },
-  },
+    
+    etherscan: {
+        apiKey: {
+            // Ethereum networks (dùng Etherscan API)
+            mainnet: ETHERSCAN_API_KEY || "",
+            sepolia: ETHERSCAN_API_KEY || "",
+            goerli: ETHERSCAN_API_KEY || "",
+            
+            // BSC networks (dùng BscScan API - KHÁC với Etherscan!)
+            bsc: BSCSCAN_API_KEY || "",
+            bscTestnet: BSCSCAN_API_KEY || "",
+        },
+        customChains: [
+            {
+                network: "bscTestnet",
+                chainId: 97,
+                urls: {
+                    apiURL: "https://api-testnet.bscscan.com/api",
+                    browserURL: "https://testnet.bscscan.com"
+                }
+            },
+            {
+                network: "bsc",
+                chainId: 56,
+                urls: {
+                    apiURL: "https://api.bscscan.com/api",
+                    browserURL: "https://bscscan.com"
+                }
+            }
+        ]
+    },
+    
+    gasReporter: {
+        enabled: process.env.REPORT_GAS === "true",
+        currency: "USD",
+        coinmarketcap: process.env.COINMARKETCAP_API_KEY || "",
+        outputFile: "gas-report.txt",
+        noColors: true,
+    },
+    
+    paths: {
+        sources: "./contracts",
+        tests: "./test",
+        cache: "./cache",
+        artifacts: "./artifacts",
+    },
 };
