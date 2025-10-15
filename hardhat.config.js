@@ -1,8 +1,35 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("dotenv").config();
 require("hardhat-gas-reporter");
+require("dotenv").config();
 
-const { PRIVATE_KEY, BSCSCAN_API_KEY, ETHERSCAN_API_KEY, SEPOLIA_RPC_URL } = process.env;
+const {
+    DEV_PRIVATE_KEY,
+    PROD_PRIVATE_KEY,
+    PRIVATE_KEY,
+    BSC_TESTNET_RPC_URL,
+    BSC_MAINNET_RPC_URL,
+    SEPOLIA_RPC_URL,
+    ETHERSCAN_API_KEY,
+    BSCSCAN_API_KEY,
+    REPORT_GAS,
+    COINMARKETCAP_API_KEY,
+    GAS_REPORTER_OFFLINE,
+    LOCAL_CHAIN_ID,
+} = process.env;
+
+const parseChainId = (value, fallback) => {
+    if (!value) return fallback;
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? fallback : parsed;
+};
+
+const devAccounts = (DEV_PRIVATE_KEY || PRIVATE_KEY)
+    ? [DEV_PRIVATE_KEY || PRIVATE_KEY]
+    : [];
+
+const prodAccounts = PROD_PRIVATE_KEY
+    ? [PROD_PRIVATE_KEY]
+    : devAccounts;
 
 module.exports = {
     solidity: {
@@ -15,54 +42,48 @@ module.exports = {
             evmVersion: "london",
         },
     },
-    
+
     networks: {
-        // Local development
-        //31337
+        // Local development (defaults to Hardhat chainId unless overridden)
         hardhat: {
-            chainId: 97,
+            chainId: parseChainId(LOCAL_CHAIN_ID, 31337),
         },
         localhost: {
             url: "http://127.0.0.1:8545",
-            chainId: 97,
+            chainId: parseChainId(LOCAL_CHAIN_ID, 31337),
+            accounts: devAccounts,
         },
-        
+
         // Ethereum Sepolia Testnet
         sepolia: {
             url: SEPOLIA_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/demo",
-            accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+            accounts: devAccounts,
             chainId: 11155111,
         },
-        
-        // BSC Testnet
+
+        // BSC Testnet (primary staging network)
         bscTestnet: {
-            url: "https://data-seed-prebsc-1-s1.binance.org:8545",
-            accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
+            url: BSC_TESTNET_RPC_URL || "https://bsc-testnet-rpc.publicnode.com",
+            accounts: devAccounts,
             chainId: 97,
         },
-        
-        // BSC Mainnet (uncomment when ready)
-        // bsc: {
-        //     url: "https://bsc-dataseed1.binance.org",
-        //     accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-        //     chainId: 56,
-        // },
-        
-        // Ethereum Mainnet (uncomment when ready)
-        // mainnet: {
-        //     url: `https://eth-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
-        //     accounts: PRIVATE_KEY ? [PRIVATE_KEY] : [],
-        //     chainId: 1,
-        // },
+
+        // BSC Mainnet (production)
+        bsc: {
+            url: BSC_MAINNET_RPC_URL || "https://bsc-dataseed1.bnbchain.org",
+            accounts: prodAccounts,
+            chainId: 56,
+        },
     },
-    
+
     etherscan: {
         apiKey: {
-            // Ethereum networks (dùng Etherscan API)
+            // Ethereum networks
             mainnet: ETHERSCAN_API_KEY || "",
             sepolia: ETHERSCAN_API_KEY || "",
             goerli: ETHERSCAN_API_KEY || "",
-                        // BSC networks (dùng BscScan API - KHÁC với Etherscan!)
+
+            // BSC networks
             bsc: BSCSCAN_API_KEY || "",
             bscTestnet: BSCSCAN_API_KEY || "",
         },
@@ -72,29 +93,30 @@ module.exports = {
                 chainId: 97,
                 urls: {
                     apiURL: "https://api-testnet.bscscan.com/api",
-                    browserURL: "https://testnet.bscscan.com"
-                }
+                    browserURL: "https://testnet.bscscan.com",
+                },
             },
             {
                 network: "bsc",
                 chainId: 56,
                 urls: {
                     apiURL: "https://api.bscscan.com/api",
-                    browserURL: "https://bscscan.com"
-                }
-            }
-        ]
+                    browserURL: "https://bscscan.com",
+                },
+            },
+        ],
     },
-    
+
     gasReporter: {
-        enabled: process.env.REPORT_GAS === "true",
+        enabled: REPORT_GAS === "true",
         currency: "USD",
-         token: "BNB", // 💡 Quan trọng: báo cáo gas theo giá BNB thay vì ETH
-        coinmarketcap: process.env.COINMARKETCAP_API_KEY || "",
+        token: "BNB", // report gas in BNB to match BSC pricing
+        coinmarketcap: COINMARKETCAP_API_KEY || "",
         outputFile: "gas-report.txt",
         noColors: true,
+        offline: GAS_REPORTER_OFFLINE === "true",
     },
-    
+
     paths: {
         sources: "./contracts",
         tests: "./test",

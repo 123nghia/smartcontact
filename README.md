@@ -98,10 +98,64 @@ smartfolder3/
 npm install --save-dev hardhat @nomicfoundation/hardhat-toolbox @openzeppelin/contracts@4.9.6 dotenv
 ```
 
+### 🔐 **Cấu hình biến môi trường (`.env` ví dụ):**
+```bash
+# RPC endpoints
+BSC_TESTNET_RPC_URL=https://bsc-testnet-rpc.publicnode.com
+BSC_MAINNET_RPC_URL=https://bsc-dataseed1.bnbchain.org
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/your-key
+
+# Private keys
+DEV_PRIVATE_KEY=0xabc...
+PROD_PRIVATE_KEY=0xdef...
+
+# (Tùy chọn) ép Hardhat dùng chainId BSC testnet khi dev local
+LOCAL_CHAIN_ID=97
+
+# Explorer API keys
+ETHERSCAN_API_KEY=your-etherscan-key
+BSCSCAN_API_KEY=your-bscscan-key
+
+# Gas reporter
+REPORT_GAS=false
+GAS_REPORTER_OFFLINE=true
+COINMARKETCAP_API_KEY=your-cmc-key
+```
+
 ### ⚙️ **Cấu hình Hardhat (`hardhat.config.js`):**
 ```js
 require("@nomicfoundation/hardhat-toolbox");
+require("hardhat-gas-reporter");
 require("dotenv").config();
+
+const {
+  DEV_PRIVATE_KEY,
+  PROD_PRIVATE_KEY,
+  PRIVATE_KEY,
+  BSC_TESTNET_RPC_URL,
+  BSC_MAINNET_RPC_URL,
+  SEPOLIA_RPC_URL,
+  ETHERSCAN_API_KEY,
+  BSCSCAN_API_KEY,
+  REPORT_GAS,
+  COINMARKETCAP_API_KEY,
+  GAS_REPORTER_OFFLINE,
+  LOCAL_CHAIN_ID,
+} = process.env;
+
+const parseChainId = (value, fallback) => {
+  if (!value) return fallback;
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? fallback : parsed;
+};
+
+const devAccounts = (DEV_PRIVATE_KEY || PRIVATE_KEY)
+  ? [DEV_PRIVATE_KEY || PRIVATE_KEY]
+  : [];
+
+const prodAccounts = PROD_PRIVATE_KEY
+  ? [PROD_PRIVATE_KEY]
+  : devAccounts;
 
 module.exports = {
   solidity: {
@@ -112,13 +166,47 @@ module.exports = {
     },
   },
   networks: {
-    hardhat: { chainId: 31337 },
-    localhost: { url: "http://127.0.0.1:8545" },
-    bsctest: {
-      url: process.env.BSC_TESTNET_URL || "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    hardhat: {
+      chainId: parseChainId(LOCAL_CHAIN_ID, 31337),
+    },
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      chainId: parseChainId(LOCAL_CHAIN_ID, 31337),
+      accounts: devAccounts,
+    },
+    sepolia: {
+      url: SEPOLIA_RPC_URL || "https://eth-sepolia.g.alchemy.com/v2/demo",
+      accounts: devAccounts,
+      chainId: 11155111,
+    },
+    bscTestnet: {
+      url: BSC_TESTNET_RPC_URL || "https://bsc-testnet-rpc.publicnode.com",
+      accounts: devAccounts,
       chainId: 97,
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-    }
+    },
+    bsc: {
+      url: BSC_MAINNET_RPC_URL || "https://bsc-dataseed1.bnbchain.org",
+      accounts: prodAccounts,
+      chainId: 56,
+    },
+  },
+  gasReporter: {
+    enabled: REPORT_GAS === "true",
+    currency: "USD",
+    token: "BNB",
+    coinmarketcap: COINMARKETCAP_API_KEY || "",
+    noColors: true,
+    outputFile: "gas-report.txt",
+    offline: GAS_REPORTER_OFFLINE === "true",
+  },
+  etherscan: {
+    apiKey: {
+      mainnet: ETHERSCAN_API_KEY || "",
+      sepolia: ETHERSCAN_API_KEY || "",
+      goerli: ETHERSCAN_API_KEY || "",
+      bsc: BSCSCAN_API_KEY || "",
+      bscTestnet: BSCSCAN_API_KEY || "",
+    },
   },
 };
 ```
@@ -149,7 +237,12 @@ npx hardhat run scripts/deploy.js --network localhost
 
 ### **Deploy lên BSC Testnet:**
 ```bash
-npx hardhat run scripts/deploy.js --network bsctest
+npx hardhat run scripts/deploy.js --network bscTestnet
+```
+
+### **Deploy lên BSC Mainnet (Production):**
+```bash
+npx hardhat run scripts/deploy.js --network bsc
 ```
 
 ### **Script deploy.js:**
@@ -240,6 +333,7 @@ RPC URL: http://127.0.0.1:8545
 Chain ID: 31337
 Currency Symbol: ETH
 ```
+> 💡 Đặt `LOCAL_CHAIN_ID=97` trong `.env` nếu muốn Hardhat giả lập BSC Testnet (gas vẫn là ETH nhưng chainId phù hợp).
 
 ### **Add Custom Token:**
 ```
@@ -259,7 +353,7 @@ npx hardhat test
 npx hardhat test test/TestToken.js
 
 # Chạy test với gas reporting
-npx hardhat test --reporter gas
+REPORT_GAS=true npx hardhat test
 ```
 
 ---
@@ -269,14 +363,23 @@ npx hardhat test --reporter gas
 ### **BSC Testnet:**
 ```bash
 # Cấu hình .env file
-BSC_TESTNET_URL=https://data-seed-prebsc-1-s1.binance.org:8545/
-PRIVATE_KEY=your_private_key_here
+DEV_PRIVATE_KEY=0xabc...                 # ví dev/staging
+BSC_TESTNET_RPC_URL=https://bsc-testnet-rpc.publicnode.com
 
 # Deploy
-npx hardhat run scripts/deploy.js --network bsctest
+npx hardhat run scripts/deploy.js --network bscTestnet
 
 # Verify contract
-npx hardhat verify --network bsctest CONTRACT_ADDRESS DEPLOYER_ADDRESS
+npx hardhat verify --network bscTestnet CONTRACT_ADDRESS DEPLOYER_ADDRESS
+```
+
+### **BSC Mainnet (Production):**
+```bash
+PROD_PRIVATE_KEY=0xprod...
+BSC_MAINNET_RPC_URL=https://bsc-dataseed1.bnbchain.org
+
+npx hardhat run scripts/deploy.js --network bsc
+npx hardhat verify --network bsc CONTRACT_ADDRESS DEPLOYER_ADDRESS
 ```
 
 ---
