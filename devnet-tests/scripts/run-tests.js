@@ -56,7 +56,8 @@ async function main() {
         // ===== 4. CHẠY TEST VỚI GAS REPORTING =====
         console.log("\n📋 Bước 4: Chạy test với gas reporting...");
         process.env.REPORT_GAS = "true";
-        await runCommand("npx", ["hardhat", "test", "--reporter", "gas"]);
+        await runCommand("npx", ["hardhat", "test"]);
+        process.env.REPORT_GAS = "false";
         console.log("✅ Gas reporting completed!");
 
         console.log("\n🎉 ====== TẤT CẢ TEST HOÀN THÀNH THÀNH CÔNG! ======");

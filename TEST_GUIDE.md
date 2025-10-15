@@ -2,12 +2,14 @@
 
 ## 📋 Tổng quan
 
-Dự án TestToken có 4 kịch bản test khác nhau để đảm bảo tất cả tính năng hoạt động đúng trên devnet:
+Dự án TestToken có 6 kịch bản test khác nhau để đảm bảo tất cả tính năng hoạt động đúng từ devnet tới BSC:
 
 1. **Hardhat Test Suite** - Test cases chính thức
 2. **Devnet Test Scenario** - Kịch bản test thực tế
-3. **Deploy & Test** - Deploy và test cùng lúc
-4. **Automated Test Runner** - Chạy tất cả test tự động
+3. **BSC Integration Test** - Kịch bản kiểm thử trực tiếp trên BSC
+4. **Deploy & Test** - Deploy và test cùng lúc
+5. **Automated Test Runner** - Chạy tất cả test tự động
+6. **Shell Script** - Tự động hóa hoàn toàn trên devnet
 
 ---
 
@@ -24,7 +26,7 @@ npx hardhat compile
 npx hardhat test
 
 # Chạy với gas reporting
-npx hardhat test --reporter gas
+REPORT_GAS=true npx hardhat test
 ```
 
 **Kết quả:** Chạy tất cả test cases trong `test/TestToken.js`
@@ -41,7 +43,24 @@ npx hardhat run devnet-tests/scripts/test-devnet.js --network localhost
 
 **Kết quả:** Chạy kịch bản test chi tiết với 14 bước kiểm tra
 
-### **3. Deploy & Test (Tự động)**
+### **3. BSC Integration Test (BSC Testnet/Mainnet)**
+
+```bash
+# Chuẩn bị biến môi trường (ví dụ)
+export PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80        # Admin có đầy đủ role + BNB gas
+export BSC_TEST_USER1_KEY=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d    # User1 có BNB gas
+export BSC_TEST_USER2_KEY=0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6    # User2 có BNB gas
+
+# Chạy kịch bản kiểm thử trên BSC Testnet
+npx hardhat run scripts/test-bsc.js --network bscTestnet
+
+# Hoặc chạy trên BSC Mainnet (chỉ khi đã audit)
+npx hardhat run scripts/test-bsc.js --network bsc
+```
+
+**Kết quả:** Deploy TestToken trực tiếp lên BSC, chạy toàn bộ luồng mint/transfer/allowance/pause/blacklist/burn và lưu báo cáo JSON tại `reports/bsc-test-report-*.json`
+
+### **4. Deploy & Test (Tự động)**
 
 ```bash
 # Khởi động Hardhat node (terminal 1)
@@ -53,7 +72,7 @@ npx hardhat run devnet-tests/scripts/deploy-and-test.js --network localhost
 
 **Kết quả:** Deploy contract và chạy test tự động
 
-### **4. Automated Test Runner (Tất cả)**
+### **5. Automated Test Runner (Tất cả)**
 
 ```bash
 # Chạy tất cả test tự động
@@ -62,7 +81,7 @@ node devnet-tests/scripts/run-tests.js
 
 **Kết quả:** Chạy toàn bộ test suite và kịch bản
 
-### **5. Shell Script (Hoàn toàn tự động)**
+### **6. Shell Script (Hoàn toàn tự động)**
 
 ```bash
 # Chạy script tự động (Linux/Mac)
