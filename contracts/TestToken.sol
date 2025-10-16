@@ -102,6 +102,10 @@ contract TestToken is
     }
 
     function transferFrom(address from, address to, uint256 amount) public override whenNotPaused returns (bool) {
+        // Kiểm tra blacklist trước
+        if (from != address(0) && _isBlacklistedInternal(from)) revert BlacklistedSender(from);
+        if (to != address(0) && _isBlacklistedInternal(to)) revert BlacklistedRecipient(to);
+        
         return super.transferFrom(from, to, amount);
     }
 
