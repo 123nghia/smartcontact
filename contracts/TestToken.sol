@@ -3,207 +3,201 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./BlacklistManager.sol";
-import "./AdminManager.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./ITestToken.sol";
 
-/// @title TEST Token (BEP-20 Utility)
-/// @notice Token tiện ích có Cap/Mint/Burn/Pause/Blacklist/AccessControl
-/// @dev Audit-ready version compatible with OpenZeppelin v4.9.6
-contract TestToken is 
-    ERC20, 
-    ERC20Burnable, 
-    ERC20Capped, 
-    Pausable, 
-    BlacklistManager,
-    AdminManager
-{
+/// @title Test Token (THB) - BEP-20/ERC-20 Utility & Governance Token
+/// @notice Token tiện ích cho nền tảng giao dịch tài sản số với đầy đủ tính năng
+/// @dev Tuân thủ tokenomic document với 100M total supply
+contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyGuard, ITestToken {
+    // ===== Constants =====
+    uint256 public constant TOTAL_SUPPLY = 100_000_000 * 10**18; // 100M THB
+    uint256 public constant MAX_SUPPLY = 150_000_000 * 10**18;   // 150M THB (có thể tăng)
+    
+    // ===== Roles =====
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
-
-    uint256 private constant CAP = 1_000_000_000 * 10 ** 18;
-
-    constructor(address admin)
-        ERC20("test", "TEST")
-        ERC20Capped(CAP)
-    {
-        _initializeAdmin(admin);
-        _setupRole(MINTER_ROLE, admin);
-        _setupRole(PAUSER_ROLE, admin);
-        _setupRole(BLACKLISTER_ROLE, admin);
-    }
-
-    // ====== Mint ======
-    function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
-        if (to == address(0)) revert ZeroAddress();
-        if (_isBlacklistedInternal(to)) revert BlacklistedRecipient(to);
-        _mint(to, amount);
-    }
-
-    // ====== Pause ======
-    function pause() external onlyRole(PAUSER_ROLE) {
-        _pause();
-    }
-
-    function unpause() external onlyRole(PAUSER_ROLE) {
-        _unpause();
-    }
-
-    // ====== Emergency ======
-    function emergencyWithdrawToken(
-        address token,
-        address to,
-        uint256 amount
-    ) external onlyRole(DEFAULT_ADMIN_ROLE) {
-        require(token != address(this), "Cannot withdraw native token");
-        require(to != address(0), "Invalid recipient");
+    bytes32 public constant GOVERNANCE_ROLE = keccak256("GOVERNANCE_ROLE");
+    bytes32 public constant STAKING_ROLE = keccak256("STAKING_ROLE");
+    bytes32 public constant VESTING_ROLE = keccak256("VESTING_ROLE");
+    bytes32 public constant BUYBACK_ROLE = keccak256("BUYBACK_ROLE");
+    
+    // ===== State Variables =====
+    bool public mintingEnabled = true;
+    bool public burningEnabled = true;
+    uint256 public totalBurned;
+    uint256 public totalMinted;
+    
+    // ===== Contract Addresses =====
+    address public vestingContract;
+    address public stakingContract;
+    address public governanceContract;
+    address public buybackContract;
+    
+    // ===== Blacklist =====
+    mapping(address => bool) public blacklisted;
+    
+    // ===== Trading Fee Discount =====
+    mapping(address => uint256) public feeDiscount; // 0-100 (percentage)
+    
+    constructor(address admin) ERC20("Test Token", "THB") {
+        if (admin == address(0)) revert ZeroAddress();
         
-        IERC20(token).transfer(to, amount);
-        emit EmergencyWithdraw(token, to, amount);
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        _setupRole(MINTER_ROLE, admin);
+        _setupRole(BURNER_ROLE, admin);
+        _setupRole(PAUSER_ROLE, admin);
+        _setupRole(GOVERNANCE_ROLE, admin);
+        _setupRole(STAKING_ROLE, admin);
+        _setupRole(VESTING_ROLE, admin);
+        _setupRole(BUYBACK_ROLE, admin);
+        
+        // Mint initial supply to admin
+        _mint(admin, TOTAL_SUPPLY);
+        totalMinted = TOTAL_SUPPLY;
     }
-
-    // ====== Burn với blacklist ======
-    function burn(uint256 amount) public override {
-        if (_isBlacklistedInternal(_msgSender())) revert BlacklistedOwner(_msgSender());
+    
+    // ===== Minting Functions =====
+    function mint(address to, uint256 amount, string calldata purpose) 
+        external 
+        onlyRole(MINTER_ROLE)
+        whenNotPaused 
+    {
+        if (!mintingEnabled) revert MintingDisabled();
+        if (to == address(0)) revert ZeroAddress();
+        if (amount == 0) revert ZeroAmount();
+        if (blacklisted[to]) revert Blacklisted();
+        if (totalSupply() + amount > MAX_SUPPLY) revert("Exceeds max supply");
+        
+        _mint(to, amount);
+        totalMinted += amount;
+        emit TokensMinted(to, amount, purpose);
+    }
+    
+    // ===== Burning Functions =====
+    function burn(uint256 amount) public override(ERC20Burnable, ITestToken) {
+        if (!burningEnabled) revert BurningDisabled();
+        if (blacklisted[_msgSender()]) revert Blacklisted();
+        
         super.burn(amount);
+        totalBurned += amount;
+        emit TokensBurned(_msgSender(), amount, "User burn");
     }
-
-    function burnFrom(address account, uint256 amount) public override {
-        if (_isBlacklistedInternal(account)) revert BlacklistedOwner(account);
-        if (_isBlacklistedInternal(_msgSender())) revert BlacklistedSender(_msgSender());
+    
+    function burnFrom(address account, uint256 amount) public override(ERC20Burnable, ITestToken) {
+        if (!burningEnabled) revert BurningDisabled();
+        if (blacklisted[account]) revert Blacklisted();
+        if (blacklisted[_msgSender()]) revert Blacklisted();
+        
         super.burnFrom(account, amount);
+        totalBurned += amount;
+        emit TokensBurned(account, amount, "Burn from");
     }
-
-    // ====== Approve với blacklist ======
-    function approve(address spender, uint256 amount) public override whenNotPaused returns (bool) {
-        address owner = _msgSender();
-        if (_isBlacklistedInternal(owner)) revert BlacklistedOwner(owner);
-        if (_isBlacklistedInternal(spender)) revert BlacklistedRecipient(spender);
-        return super.approve(spender, amount);
+    
+    // ===== Transfer Functions =====
+    function transfer(address to, uint256 amount) public override(ERC20, IERC20) whenNotPaused returns (bool) {
+        if (blacklisted[_msgSender()]) revert Blacklisted();
+        if (blacklisted[to]) revert Blacklisted();
+        
+        bool success = super.transfer(to, amount);
+        if (success) {
+            emit TokensTransferred(_msgSender(), to, amount);
+        }
+        return success;
     }
-
-    function increaseAllowance(address spender, uint256 addedValue) public override whenNotPaused returns (bool) {
-        address owner = _msgSender();
-        if (_isBlacklistedInternal(owner)) revert BlacklistedOwner(owner);
-        if (_isBlacklistedInternal(spender)) revert BlacklistedRecipient(spender);
-        return super.increaseAllowance(spender, addedValue);
-    }
-
-    function decreaseAllowance(address spender, uint256 subtractedValue) public override whenNotPaused returns (bool) {
-        address owner = _msgSender();
-        if (_isBlacklistedInternal(owner)) revert BlacklistedOwner(owner);
-        return super.decreaseAllowance(spender, subtractedValue);
-    }
-
-    // ====== Transfer với pause ======
-    function transfer(address to, uint256 amount) public override whenNotPaused returns (bool) {
-        return super.transfer(to, amount);
-    }
-
-    function transferFrom(address from, address to, uint256 amount) public override whenNotPaused returns (bool) {
-        // Kiểm tra blacklist trước
-        if (from != address(0) && _isBlacklistedInternal(from)) revert BlacklistedSender(from);
-        if (to != address(0) && _isBlacklistedInternal(to)) revert BlacklistedRecipient(to);
+    
+    function transferFrom(address from, address to, uint256 amount) public override(ERC20, IERC20) whenNotPaused returns (bool) {
+        if (blacklisted[from]) revert Blacklisted();
+        if (blacklisted[to]) revert Blacklisted();
+        if (blacklisted[_msgSender()]) revert Blacklisted();
         
         return super.transferFrom(from, to, amount);
     }
-
-    // ====== Overrides ======
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override whenNotPaused {
-        if (from != address(0) && _isBlacklistedInternal(from)) revert BlacklistedSender(from);
-        if (to != address(0) && _isBlacklistedInternal(to)) revert BlacklistedRecipient(to);
-        
-        super._beforeTokenTransfer(from, to, amount);
+    
+    // ===== Admin Functions =====
+    function pause() external onlyRole(PAUSER_ROLE) {
+        _pause();
     }
-
-    function _mint(address account, uint256 amount)
-        internal
-        override(ERC20, ERC20Capped)
-    {
-        super._mint(account, amount);
+    
+    function unpause() external onlyRole(PAUSER_ROLE) {
+        _unpause();
     }
-
-    // ====== Override AccessControl functions ======
-    function grantRole(bytes32 role, address account) 
-        public 
-        override(AccessControl, AdminManager) 
-        onlyRole(getRoleAdmin(role)) 
-    {
-        AdminManager.grantRole(role, account);
+    
+    function toggleMinting() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        mintingEnabled = !mintingEnabled;
     }
-
-    function revokeRole(bytes32 role, address account) 
-        public 
-        override(AccessControl, AdminManager) 
-        onlyRole(getRoleAdmin(role)) 
-    {
-        AdminManager.revokeRole(role, account);
+    
+    function toggleBurning() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        burningEnabled = !burningEnabled;
     }
-
-    function renounceRole(bytes32 role, address account) 
-        public 
-        override(AccessControl, AdminManager) 
-    {
-        AdminManager.renounceRole(role, account);
+    
+    function setBlacklisted(address account, bool status) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (account == address(0)) revert ZeroAddress();
+        blacklisted[account] = status;
     }
-
-    // ====== View Functions ======
-    function isPaused() external view returns (bool) {
-        return paused();
+    
+    function setFeeDiscount(address account, uint256 discount) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (account == address(0)) revert ZeroAddress();
+        if (discount > 100) revert("Invalid discount");
+        feeDiscount[account] = discount;
     }
-
+    
+    // ===== Contract Management =====
+    function setVestingContract(address _vesting) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        vestingContract = _vesting;
+    }
+    
+    function setStakingContract(address _staking) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        stakingContract = _staking;
+    }
+    
+    function setGovernanceContract(address _governance) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        governanceContract = _governance;
+    }
+    
+    function setBuybackContract(address _buyback) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        buybackContract = _buyback;
+    }
+    
+    // ===== View Functions =====
     function getTokenInfo() external view returns (
-        string memory tokenName,
-        string memory tokenSymbol,
-        uint8 tokenDecimals,
-        uint256 tokenTotalSupply,
-        uint256 tokenCap
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 totalSupply_,
+        uint256 maxSupply_,
+        uint256 totalMinted_,
+        uint256 totalBurned_,
+        bool mintingEnabled_,
+        bool burningEnabled_
     ) {
-        return (name(), symbol(), decimals(), totalSupply(), cap());
+        return (
+            "Test Token",
+            "THB",
+            18,
+            totalSupply(),
+            MAX_SUPPLY,
+            totalMinted,
+            totalBurned,
+            mintingEnabled,
+            burningEnabled
+        );
     }
-
-    function hasAnyRole(address account) external view returns (bool) {
-        return hasRole(DEFAULT_ADMIN_ROLE, account) ||
-               hasRole(MINTER_ROLE, account) ||
-               hasRole(PAUSER_ROLE, account) ||
-               hasRole(BLACKLISTER_ROLE, account);
-    }
-
-    /// @notice Xem số dư và trạng thái của một địa chỉ
+    
     function getAccountInfo(address account) external view returns (
         uint256 balance,
-        bool isBlacklistedStatus,
-        bool hasAdminRole,
-        bool hasMinterRole,
-        bool hasPauserRole,
-        bool hasBlacklisterRole
+        uint256 allowance_,
+        bool isBlacklisted_,
+        uint256 feeDiscount_
     ) {
         return (
             balanceOf(account),
-            isBlacklisted(account),
-            hasRole(DEFAULT_ADMIN_ROLE, account),
-            hasRole(MINTER_ROLE, account),
-            hasRole(PAUSER_ROLE, account),
-            hasRole(BLACKLISTER_ROLE, account)
+            allowance(account, _msgSender()),
+            blacklisted[account],
+            feeDiscount[account]
         );
-    }
-
-    /// @notice Xem số dư của nhiều địa chỉ cùng lúc
-    function getBalancesBatch(address[] calldata accounts) external view returns (uint256[] memory) {
-        uint256[] memory balances = new uint256[](accounts.length);
-        for (uint256 i = 0; i < accounts.length; i++) {
-            balances[i] = balanceOf(accounts[i]);
-        }
-        return balances;
-    }
-
-    /// @notice Xem số token còn có thể mint
-    function getRemainingMintable() external view returns (uint256) {
-        return cap() - totalSupply();
     }
 }

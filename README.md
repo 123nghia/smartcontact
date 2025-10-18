@@ -1,8 +1,8 @@
 
-# 🧾 TestToken - BEP-20 Utility Token
+# 🚀 TestToken - BEP-20 Utility Token
 
 ### 🧠 Dự án: TestToken (BEP-20 Utility Token)
-**Mục tiêu:** Triển khai token tiện ích với đầy đủ tính năng quản lý nâng cao: Cap/Mint/Burn/Pause/Blacklist/AccessControl trên Hardhat Devnet và Testnet.
+**Mục tiêu:** Triển khai token tiện ích cho nền tảng giao dịch tài sản số với khả năng update và mint thêm token linh hoạt, hỗ trợ vesting system phức tạp.
 
 **Trạng thái:** ✅ **Production Ready** - Smart contract đã được kiểm tra và sẵn sàng triển khai
 
@@ -25,18 +25,14 @@
 ```
 smartfolder3/
 ├── contracts/
-│   ├── TestToken.sol           # Contract chính - Token BEP-20
+│   ├── TokenHub.sol            # Contract chính - Token Hub BEP-20
+│   ├── TokenHubVesting.sol     # Vesting system cho Token Hub
 │   ├── AdminManager.sol        # Quản lý admin roles với bảo vệ
-│   ├── BlacklistManager.sol    # Quản lý blacklist system
-│   ├── ITestToken.sol          # Interface với custom errors/events
-│   ├── ITestTokenErrors.sol    # Custom errors definitions
-│   └── ITestTokenEvents.sol    # Custom events definitions
+│   └── BlacklistManager.sol    # Quản lý blacklist system
 ├── scripts/
-│   ├── deploy.js               # Deploy script chính
-│   └── test-bsc.js             # Test script cho BSC
+│   └── deploy-tokenhub.js      # Deploy script cho TokenHub
 ├── test/
-│   ├── TestToken.js            # Test suite chính
-│   └── Lock.js                 # Test mẫu Hardhat
+│   └── TokenHub.js             # Test suite cho TokenHub
 ├── devnet-tests/               # Thư mục test devnet
 │   ├── scripts/
 │   │   ├── deploy-and-test.js  # Deploy và test tự động
@@ -51,6 +47,7 @@ smartfolder3/
 ├── hardhat.config.js           # Hardhat configuration
 ├── package.json                # Dependencies
 ├── TEST_GUIDE.md              # Hướng dẫn test
+├── TOKENHUB_SUMMARY.md        # Tóm tắt TokenHub
 └── README.md                   # Documentation này
 ```
 
@@ -58,10 +55,10 @@ smartfolder3/
 
 ## 🪙 3️⃣ MÔ TẢ CONTRACT
 
-**Tên Token:** `test`  
-**Ký hiệu:** `TEST`  
+**Tên Token:** `Test Token`  
+**Ký hiệu:** `Test`  
 **Decimals:** 18  
-**Tổng cung tối đa (cap):** 1,000,000,000 TEST  
+**Tổng cung tối đa (cap):** 100,000,000 Test  
 **Chuẩn:** BEP-20 (tương thích ERC-20)  
 **Solidity Version:** ^0.8.28  
 **OpenZeppelin:** v4.9.6 (Audit-ready)
@@ -89,6 +86,8 @@ smartfolder3/
 - **MINTER_ROLE**: Quyền mint tokens
 - **PAUSER_ROLE**: Quyền pause/unpause
 - **BLACKLISTER_ROLE**: Quyền quản lý blacklist
+- **CAP_MANAGER_ROLE**: Quyền quản lý cap
+- **VESTING_MANAGER_ROLE**: Quyền quản lý vesting
 - **Bảo vệ**: Không cho phép renounce admin cuối cùng
 
 #### ✅ **Emergency Features**
@@ -100,11 +99,14 @@ smartfolder3/
 - **Batch Operations**: Xem số dư nhiều địa chỉ cùng lúc
 - **Account Info**: Xem đầy đủ thông tin tài khoản (balance, roles, blacklist)
 - **Mintable Check**: Kiểm tra số token còn có thể mint
+- **Cap Management**: Quản lý max supply linh hoạt
+- **Purpose Tracking**: Track mục đích mint/burn
 
 #### ✅ **Integration**
-- **OpenZeppelin**: ERC20, ERC20Burnable, ERC20Capped, Pausable, AccessControl
+- **OpenZeppelin**: ERC20, ERC20Burnable, Pausable, AccessControl
 - **Custom Errors**: Thay vì require để tiết kiệm gas
 - **Events**: Đầy đủ events cho tracking
+- **Vesting System**: TokenHubVesting contract tích hợp
 
 ---
 
@@ -251,44 +253,48 @@ npx hardhat node
 
 ### **Deploy lên localhost:**
 ```bash
-npx hardhat run scripts/deploy.js --network localhost
+npx hardhat run scripts/deploy-tokenhub.js --network localhost
 ```
 
 ### **Deploy lên BSC Testnet:**
 ```bash
-npx hardhat run scripts/deploy.js --network bscTestnet
+npx hardhat run scripts/deploy-tokenhub.js --network bscTestnet
 ```
 
 ### **Deploy lên BSC Mainnet (Production):**
 ```bash
-npx hardhat run scripts/deploy.js --network bsc
+npx hardhat run scripts/deploy-tokenhub.js --network bsc
 ```
 
-### **Script deploy.js:**
+### **Script deploy-tokenhub.js:**
 ```js
 const hre = require("hardhat");
 
 async function main() {
-  const [deployer] = await hre.ethers.getSigners();
-  console.log("🚀 Deploying contracts with:", deployer.address);
-
-  const balance = await hre.ethers.provider.getBalance(deployer.address);
-  console.log("💰 Deployer balance:", hre.ethers.formatEther(balance), "ETH");
-
-  const TestToken = await hre.ethers.getContractFactory("TestToken");
-  const token = await TestToken.deploy(deployer.address);
-  await token.waitForDeployment();
-
-  const tokenAddress = await token.getAddress();
-  console.log("✅ TestToken deployed at:", tokenAddress);
+  console.log("🚀 Deploying Token Hub Contracts...");
   
-  // In thông tin token
-  console.log("📋 Token Info:");
-  console.log("  Name:", await token.name());
-  console.log("  Symbol:", await token.symbol());
-  console.log("  Decimals:", await token.decimals());
-  console.log("  Total Supply:", (await token.totalSupply()).toString());
-  console.log("  Cap:", (await token.cap()).toString());
+  const [deployer] = await hre.ethers.getSigners();
+  console.log("📋 Deploying contracts with account:", deployer.address);
+
+  // Deploy TokenHub
+  const TokenHub = await hre.ethers.getContractFactory("TokenHub");
+  const tokenHub = await TokenHub.deploy(deployer.address);
+  await tokenHub.waitForDeployment();
+
+  const tokenHubAddress = await tokenHub.getAddress();
+  console.log("✅ TokenHub deployed at:", tokenHubAddress);
+
+  // Deploy Vesting Contract
+  const TokenHubVesting = await hre.ethers.getContractFactory("TokenHubVesting");
+  const vesting = await TokenHubVesting.deploy(tokenHubAddress, deployer.address);
+  await vesting.waitForDeployment();
+
+  const vestingAddress = await vesting.getAddress();
+  console.log("✅ TokenHubVesting deployed at:", vestingAddress);
+
+  // Setup vesting contract
+  await tokenHub.setVestingContract(vestingAddress, true);
+  console.log("✅ Vesting contract linked to TokenHub");
 }
 
 main().catch((error) => {
@@ -307,38 +313,51 @@ npx hardhat console --network localhost
 ### **Các lệnh hữu ích:**
 ```js
 // Kết nối contract
-const token = await ethers.getContractAt("TestToken", "CONTRACT_ADDRESS");
+const testToken = await ethers.getContractAt("TestToken", "TESTTOKEN_ADDRESS");
+const vesting = await ethers.getContractAt("TestTokenVesting", "VESTING_ADDRESS");
 
 // Xem thông tin cơ bản
-await token.name();                    // "test"
-await token.symbol();                  // "TEST"
-await token.decimals();                // 18
-await token.totalSupply();             // Tổng cung hiện tại
-await token.cap();                     // Tổng cung tối đa
+await testToken.name();                    // "Test Token"
+await testToken.symbol();                  // "Test"
+await testToken.decimals();                // 18
+await testToken.currentSupply();           // Tổng cung hiện tại
+await testToken.maxSupply();               // Tổng cung tối đa
 
 // Xem thông tin account
-await token.getAccountInfo("ADDRESS"); // balance, blacklist, roles
-await token.getTokenInfo();            // Tất cả thông tin token
+await testToken.getAccountInfo("ADDRESS"); // balance, blacklist, roles
+await testToken.getTokenInfo();            // Tất cả thông tin token
+await testToken.getCapInfo();              // Thông tin cap management
 
 // Kiểm tra roles
-await token.hasRole(await token.DEFAULT_ADMIN_ROLE(), "ADDRESS");
-await token.hasRole(await token.MINTER_ROLE(), "ADDRESS");
-await token.hasRole(await token.PAUSER_ROLE(), "ADDRESS");
-await token.hasRole(await token.BLACKLISTER_ROLE(), "ADDRESS");
+await testToken.hasRole(await testToken.DEFAULT_ADMIN_ROLE(), "ADDRESS");
+await testToken.hasRole(await testToken.MINTER_ROLE(), "ADDRESS");
+await testToken.hasRole(await testToken.PAUSER_ROLE(), "ADDRESS");
+await testToken.hasRole(await testToken.BLACKLISTER_ROLE(), "ADDRESS");
+await testToken.hasRole(await testToken.CAP_MANAGER_ROLE(), "ADDRESS");
+await testToken.hasRole(await testToken.VESTING_MANAGER_ROLE(), "ADDRESS");
 
 // Kiểm tra trạng thái
-await token.isPaused();                // false
-await token.isBlacklisted("ADDRESS");  // false
+await testToken.isPaused();                // false
+await testToken.isBlacklisted("ADDRESS");  // false
+await testToken.mintingEnabled();          // true
+await testToken.capIncreaseEnabled();      // false
 
 // Mint tokens (chỉ admin/minter)
-await token.mint("ADDRESS", ethers.parseEther("1000"));
+await testToken.mint("ADDRESS", ethers.parseEther("1000"), "Purpose");
+
+// Cap management (chỉ cap manager)
+await testToken.toggleCapIncrease();
+await testToken.increaseMaxSupply(ethers.parseEther("150000000"));
+
+// Vesting (chỉ vesting manager)
+await vesting.createTokenomicVesting("ADDRESS", ethers.parseEther("1000000"), 10, 0, 12, "Team");
 
 // Blacklist (chỉ blacklister)
-await token.setBlacklisted("ADDRESS", true);
+await testToken.setBlacklisted("ADDRESS", true);
 
 // Pause contract (chỉ pauser)
-await token.pause();
-await token.unpause();
+await testToken.pause();
+await testToken.unpause();
 ```
 
 ---
@@ -356,8 +375,8 @@ Currency Symbol: ETH
 
 ### **Add Custom Token:**
 ```
-Token Contract Address: [CONTRACT_ADDRESS_FROM_DEPLOY]
-Token Symbol: TEST
+Token Contract Address: [TESTTOKEN_ADDRESS_FROM_DEPLOY]
+Token Symbol: Test
 Decimals: 18
 ```
 
@@ -371,7 +390,7 @@ Decimals: 18
 npx hardhat test
 
 # Chạy test cụ thể
-npx hardhat test test/TestToken.js
+npx hardhat test test/TokenHub.js
 
 # Chạy test với gas reporting
 REPORT_GAS=true npx hardhat test
@@ -391,8 +410,8 @@ node scripts/deploy-and-test.js     # Terminal 2
 
 ### **Test BSC Testnet:**
 ```bash
-# Test trên BSC Testnet
-node scripts/test-bsc.js
+# Test trên BSC Testnet (cần tạo script mới)
+# node scripts/test-bsc-tokenhub.js
 ```
 
 ---
@@ -406,10 +425,11 @@ DEV_PRIVATE_KEY=0xabc...                 # ví dev/staging
 BSC_TESTNET_RPC_URL=https://bsc-testnet-rpc.publicnode.com
 
 # Deploy
-npx hardhat run scripts/deploy.js --network bscTestnet
+npx hardhat run scripts/deploy-tokenhub.js --network bscTestnet
 
-# Verify contract
-npx hardhat verify --network bscTestnet CONTRACT_ADDRESS DEPLOYER_ADDRESS
+# Verify contracts
+npx hardhat verify --network bscTestnet TOKENHUB_ADDRESS DEPLOYER_ADDRESS
+npx hardhat verify --network bscTestnet VESTING_ADDRESS TOKENHUB_ADDRESS DEPLOYER_ADDRESS
 ```
 
 ### **BSC Mainnet (Production):**
@@ -417,8 +437,9 @@ npx hardhat verify --network bscTestnet CONTRACT_ADDRESS DEPLOYER_ADDRESS
 PROD_PRIVATE_KEY=0xprod...
 BSC_MAINNET_RPC_URL=https://bsc-dataseed1.bnbchain.org
 
-npx hardhat run scripts/deploy.js --network bsc
-npx hardhat verify --network bsc CONTRACT_ADDRESS DEPLOYER_ADDRESS
+npx hardhat run scripts/deploy-tokenhub.js --network bsc
+npx hardhat verify --network bsc TOKENHUB_ADDRESS DEPLOYER_ADDRESS
+npx hardhat verify --network bsc VESTING_ADDRESS TOKENHUB_ADDRESS DEPLOYER_ADDRESS
 ```
 
 ---
@@ -508,6 +529,6 @@ npx hardhat verify --network bsc CONTRACT_ADDRESS DEPLOYER_ADDRESS
 
 ---
 
-**🎉 TestToken - Production Ready Smart Contract!**
+**🎉 TokenHub - Production Ready Smart Contract!**
 
-*Smart contract BEP-20 utility token với đầy đủ tính năng bảo mật và quản lý, sẵn sàng triển khai trên BSC và các mạng tương thích.*
+*Smart contract BEP-20 utility token với khả năng update và mint thêm token linh hoạt, hỗ trợ vesting system phức tạp, sẵn sàng triển khai trên BSC và các mạng tương thích.*

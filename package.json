@@ -1,6 +1,46 @@
 {
-  "name": "smartfolder3",
+  "name": "test-token-ecosystem",
   "version": "1.0.0",
+  "description": "Test Token Ecosystem - Complete BEP-20/ERC-20 token with vesting, staking, governance, and buyback mechanisms",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:unit": "node scripts/run-tests.js unit",
+    "test:integration": "node scripts/run-tests.js integration", 
+    "test:gas": "node scripts/run-tests.js gas --gas-report",
+    "test:comprehensive": "node scripts/run-tests.js comprehensive",
+    "test:all": "node scripts/run-tests.js all",
+    "test:coverage": "hardhat coverage",
+    "deploy:local": "hardhat run scripts/deploy-testtoken-ecosystem.js --network localhost",
+    "deploy:testnet": "hardhat run scripts/deploy-testnet.js --network bsc-testnet",
+    "deploy:mainnet": "hardhat run scripts/deploy-production.js --network bsc-mainnet",
+    "verify": "hardhat run scripts/verify-contracts.js",
+    "clean": "hardhat clean",
+    "size": "hardhat size-contracts",
+    "gas-report": "REPORT_GAS=true hardhat test",
+    "lint": "solhint 'contracts/**/*.sol'",
+    "lint:fix": "solhint 'contracts/**/*.sol' --fix",
+    "format": "prettier --write 'contracts/**/*.sol' 'test/**/*.js' 'scripts/**/*.js'",
+    "docs": "solidity-docgen",
+    "deploy:all": "npm run deploy:local && npm run deploy:testnet",
+    "test:full": "npm run test:all && npm run test:coverage"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "bsc",
+    "smart-contracts",
+    "defi",
+    "token",
+    "vesting",
+    "staking",
+    "governance",
+    "buyback",
+    "burn"
+  ],
+  "author": "Test Token Team",
+  "license": "MIT",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
     "@nomicfoundation/hardhat-ethers": "^3.1.0",
@@ -16,11 +56,19 @@
     "hardhat": "^2.26.3",
     "hardhat-gas-reporter": "^2.3.0",
     "solidity-coverage": "^0.8.16",
-    "typechain": "^8.3.2"
+    "typechain": "^8.3.2",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "^1.1.0",
+    "solhint": "^4.0.0",
+    "solidity-docgen": "^0.6.0"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.6",
     "dotenv": "^17.2.3",
     "solc": "^0.8.20"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }
