@@ -327,12 +327,12 @@ await buybackBurn.executeBurn();
 
 ## 🧩 8️⃣ KIỂM TRA TRONG METAMASK
 
-### **Network: Hardhat Devnet**
+### **Network: Hardhat Devnet (BNB Simulation)**
 ```
-Network Name: Hardhat Local
+Network Name: Hardhat Local BNB
 RPC URL: http://127.0.0.1:8545
 Chain ID: 31337
-Currency Symbol: ETH
+Currency Symbol: BNB
 ```
 
 ### **Add Custom Token:**

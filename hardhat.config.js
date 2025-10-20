@@ -47,11 +47,20 @@ module.exports = {
         // Local development (defaults to Hardhat chainId unless overridden)
         hardhat: {
             chainId: parseChainId(LOCAL_CHAIN_ID, 31337),
+            // Configure for BNB simulation
+            gasPrice: 5000000000, // 5 gwei (similar to BSC)
+            blockGasLimit: 30000000, // BSC block gas limit
+            accounts: {
+                mnemonic: "test test test test test test test test test test test junk",
+                count: 20,
+                accountsBalance: "10000000000000000000000", // 10,000 BNB per account
+            },
         },
         localhost: {
             url: "http://127.0.0.1:8545",
             chainId: parseChainId(LOCAL_CHAIN_ID, 31337),
             accounts: devAccounts,
+            gasPrice: 5000000000, // 5 gwei
         },
 
         // Ethereum Sepolia Testnet

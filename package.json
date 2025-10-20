@@ -26,7 +26,18 @@
     "deploy:all": "npm run deploy:local && npm run deploy:testnet",
     "test:full": "npm run test:all && npm run test:coverage",
     "demo": "node scripts/demo-tests.js",
-    "quick-test": "./quick-test.sh"
+    "quick-test": "./quick-test.sh",
+    "quick-deploy": "hardhat run scripts/quick-deploy.js",
+    "test-ecosystem": "hardhat run scripts/test-ecosystem.js",
+    "test-bnb": "hardhat run scripts/test-bnb-config.js",
+    "deploy-and-test": "./deploy-and-test.sh",
+    "deploy": "hardhat run scripts/deploy.js",
+    "test": "hardhat run scripts/test.js",
+    "full": "hardhat run scripts/full.js",
+    "deploy:bsc": "hardhat run bsc-deployment/scripts/deploy-bsc.js --network bscTestnet",
+    "verify:bsc": "hardhat run bsc-deployment/scripts/verify-contracts.js --network bscTestnet",
+    "test:bsc": "hardhat run bsc-deployment/scripts/test-bsc.js --network bscTestnet",
+    "setup": "cp env.example .env && echo 'Please update .env with your actual values'"
   },
   "keywords": [
     "blockchain",

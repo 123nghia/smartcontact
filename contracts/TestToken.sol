@@ -8,15 +8,12 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./ITestToken.sol";
 
-/// @title Test Token (THB) - BEP-20/ERC-20 Utility & Governance Token
-/// @notice Token tiện ích cho nền tảng giao dịch tài sản số với đầy đủ tính năng
-/// @dev Tuân thủ tokenomic document với 100M total supply
+/// @title Test Token - ERC-20 Utility & Governance Token
+/// @notice Utility token with full features
+/// @dev Compliant with 100M total supply
 contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyGuard, ITestToken {
-    // ===== Constants =====
-    uint256 public constant TOTAL_SUPPLY = 100_000_000 * 10**18; // 100M THB
-    uint256 public constant MAX_SUPPLY = 150_000_000 * 10**18;   // 150M THB (có thể tăng)
-    
-    // ===== Roles =====
+    uint256 public constant TOTAL_SUPPLY = 100_000_000 * 10**18;
+    uint256 public constant MAX_SUPPLY = 150_000_000 * 10**18;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
@@ -24,26 +21,20 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
     bytes32 public constant STAKING_ROLE = keccak256("STAKING_ROLE");
     bytes32 public constant VESTING_ROLE = keccak256("VESTING_ROLE");
     bytes32 public constant BUYBACK_ROLE = keccak256("BUYBACK_ROLE");
-    
-    // ===== State Variables =====
     bool public mintingEnabled = true;
     bool public burningEnabled = true;
     uint256 public totalBurned;
     uint256 public totalMinted;
     
-    // ===== Contract Addresses =====
     address public vestingContract;
     address public stakingContract;
     address public governanceContract;
     address public buybackContract;
     
-    // ===== Blacklist =====
     mapping(address => bool) public blacklisted;
+    mapping(address => uint256) public feeDiscount;
     
-    // ===== Trading Fee Discount =====
-    mapping(address => uint256) public feeDiscount; // 0-100 (percentage)
-    
-    constructor(address admin) ERC20("Test Token", "THB") {
+    constructor(address admin) ERC20("Test Token", "TEST") {
         if (admin == address(0)) revert ZeroAddress();
         
         _setupRole(DEFAULT_ADMIN_ROLE, admin);
@@ -55,12 +46,10 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
         _setupRole(VESTING_ROLE, admin);
         _setupRole(BUYBACK_ROLE, admin);
         
-        // Mint initial supply to admin
         _mint(admin, TOTAL_SUPPLY);
         totalMinted = TOTAL_SUPPLY;
     }
     
-    // ===== Minting Functions =====
     function mint(address to, uint256 amount, string calldata purpose) 
         external 
         onlyRole(MINTER_ROLE)
@@ -77,7 +66,6 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
         emit TokensMinted(to, amount, purpose);
     }
     
-    // ===== Burning Functions =====
     function burn(uint256 amount) public override(ERC20Burnable, ITestToken) {
         if (!burningEnabled) revert BurningDisabled();
         if (blacklisted[_msgSender()]) revert Blacklisted();
@@ -97,7 +85,6 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
         emit TokensBurned(account, amount, "Burn from");
     }
     
-    // ===== Transfer Functions =====
     function transfer(address to, uint256 amount) public override(ERC20, IERC20) whenNotPaused returns (bool) {
         if (blacklisted[_msgSender()]) revert Blacklisted();
         if (blacklisted[to]) revert Blacklisted();
@@ -117,7 +104,6 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
         return super.transferFrom(from, to, amount);
     }
     
-    // ===== Admin Functions =====
     function pause() external onlyRole(PAUSER_ROLE) {
         _pause();
     }
@@ -145,7 +131,6 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
         feeDiscount[account] = discount;
     }
     
-    // ===== Contract Management =====
     function setVestingContract(address _vesting) external onlyRole(DEFAULT_ADMIN_ROLE) {
         vestingContract = _vesting;
     }
@@ -162,7 +147,6 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
         buybackContract = _buyback;
     }
     
-    // ===== View Functions =====
     function getTokenInfo() external view returns (
         string memory name,
         string memory symbol,
@@ -176,7 +160,7 @@ contract TestToken is ERC20, ERC20Burnable, Pausable, AccessControl, ReentrancyG
     ) {
         return (
             "Test Token",
-            "THB",
+            "TEST",
             18,
             totalSupply(),
             MAX_SUPPLY,
