@@ -1,0 +1,98 @@
+ npx hardhat run scripts/bsc-testnet-deploy.js --network bscTestnet
+[dotenv@17.2.3] injecting env (17) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+🚀 ====== BSC TESTNET DEPLOYMENT ======
+📅 Deployment Time: 2025-10-21T07:07:31.867Z
+
+👤 Deployer Information:
+   Address: 0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1
+   Network: bscTestnet
+   Chain ID: 97
+   BNB Balance: 0.29999748 BNB
+
+⛽ Gas Estimation:
+   Estimated Gas: 4348480
+   Gas Price: 0.1 Gwei
+   Estimated Cost: 0.000434848 BNB
+
+🔨 Deploying TokenHub Contract...
+✅ Deployment Successful!
+   Contract Address: 0x77876996A66F05a3f56F26398948A9Bee5907C32
+   Transaction Hash: 0x5d8b0620e6a1eda7b2a78ee982e8ada215bc20e4926680415813be875a17d6db
+   Deployment Time: 2.90 seconds
+   Gas Used: 4348480
+
+📊 Token Information:
+   Name: Token Hub
+   Symbol: THD
+   Decimals: 18
+   Total Supply: 100000000.0 THD
+   Total Burned: 0.0 THD
+   Minting Enabled: true
+   Burning Enabled: true
+
+🧪 Testing Basic Functions:
+   🪙 Testing mint function...
+   ✅ Minted 1000 THD
+   👑 Testing VIP tier system...
+   ✅ VIP Tier: 0
+   ✅ Fee Discount: 0 %
+   🗳️ Testing governance system...
+   ✅ Created test proposal
+   💰 Testing staking system...
+   ✅ Staked 10,000 THD for 30 days
+
+📈 Final Statistics:
+   Total Supply: 100001000.0 THD
+   Total Staked: 10000.0 THD
+   Proposal Count: 1
+   Total Burned: 0.0 THD
+
+🔍 BSCScan Verification:
+   Contract Address: 0x77876996A66F05a3f56F26398948A9Bee5907C32
+   Verification Command:
+   npx hardhat verify --network bscTestnet 0x77876996A66F05a3f56F26398948A9Bee5907C32 "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1"
+
+🌐 Network Information:
+   BSC Testnet Explorer: https://testnet.bscscan.com/address/0x77876996A66F05a3f56F26398948A9Bee5907C32
+   BSC Testnet RPC: https://bsc-testnet-rpc.publicnode.com
+   Chain ID: 97
+   Currency: tBNB
+
+📋 Deployment Summary:
+   ✅ Contract deployed successfully
+   ✅ All basic functions tested
+   ✅ Token info verified
+   ✅ Ready for verification on BSCScan
+
+💾 Deployment Info (JSON):
+{
+  "network": "BSC Testnet",
+  "chainId": "97",
+  "contractAddress": "0x77876996A66F05a3f56F26398948A9Bee5907C32",
+  "deployer": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
+  "deploymentTime": "2025-10-21T07:07:41.548Z",
+  "deploymentDuration": 2.899,
+  "transactionHash": "0x5d8b0620e6a1eda7b2a78ee982e8ada215bc20e4926680415813be875a17d6db",
+  "gasUsed": "4348480",
+  "tokenInfo": {
+    "name": "Token Hub",
+    "symbol": "THD",
+    "decimals": "18",
+    "totalSupply": "100000000.0",
+    "totalBurned": "0.0",
+    "mintingEnabled": true,
+    "burningEnabled": true
+  },
+  "finalStats": {
+    "totalSupply": "100001000.0",
+    "totalStaked": "10000.0",
+    "proposalCount": "1"
+  },
+  "verificationCommand": "npx hardhat verify --network bscTestnet 0x77876996A66F05a3f56F26398948A9Bee5907C32 \"0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1\"",
+  "explorerUrl": "https://testnet.bscscan.com/address/0x77876996A66F05a3f56F26398948A9Bee5907C32"
+}
+
+🎉 BSC Testnet Deployment Completed Successfully!
+
+🎯 Deployment Result: 0x77876996A66F05a3f56F26398948A9Bee5907C32

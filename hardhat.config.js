@@ -40,6 +40,7 @@ module.exports = {
                 runs: 200,
             },
             evmVersion: "london",
+            viaIR: true,
         },
     },
 
@@ -72,7 +73,7 @@ module.exports = {
 
         // BSC Testnet (primary staging network)
         bscTestnet: {
-            url: BSC_TESTNET_RPC_URL || "https://bsc-testnet-rpc.publicnode.com",
+            url: BSC_TESTNET_RPC_URL || "https://data-seed-prebsc-1-s1.binance.org:8545",
             accounts: devAccounts,
             chainId: 97,
         },
@@ -86,16 +87,8 @@ module.exports = {
     },
 
     etherscan: {
-        apiKey: {
-            // Ethereum networks
-            mainnet: ETHERSCAN_API_KEY || "",
-            sepolia: ETHERSCAN_API_KEY || "",
-            goerli: ETHERSCAN_API_KEY || "",
-
-            // BSC networks
-            bsc: BSCSCAN_API_KEY || "",
-            bscTestnet: BSCSCAN_API_KEY || "",
-        },
+        apiKey: BSCSCAN_API_KEY,
+        
         customChains: [
             {
                 network: "bscTestnet",

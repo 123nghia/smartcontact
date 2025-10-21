@@ -3,21 +3,23 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// @title Test Token Interface
-/// @notice Interface chính cho Test Token ecosystem
-interface ITestToken is IERC20 {
+/// @title Token Hub Interface
+/// @notice Interface chính cho Token Hub ecosystem
+interface ITokenHub is IERC20 {
     // ===== Events =====
     event TokensMinted(address indexed to, uint256 amount, string purpose);
     event TokensBurned(address indexed from, uint256 amount, string purpose);
     event TokensTransferred(address indexed from, address indexed to, uint256 amount);
-    event StakingStarted(address indexed user, uint256 amount, uint256 duration);
-    event StakingEnded(address indexed user, uint256 amount, uint256 reward);
+    event TokensStaked(address indexed user, uint256 amount, uint256 lockDuration);
+    event TokensUnstaked(address indexed user, uint256 amount);
+    event StakingRewardsClaimed(address indexed user, uint256 amount);
     event VoteCast(address indexed voter, uint256 proposalId, bool support, uint256 weight);
     event ProposalCreated(uint256 indexed proposalId, address proposer, string description);
-    event BuybackExecuted(uint256 amount, uint256 price);
-    event BurnExecuted(uint256 amount);
-    event VestingScheduleCreated(address indexed beneficiary, uint256 amount, string category);
-    event TokensReleased(address indexed beneficiary, uint256 amount);
+    event ProposalExecuted(uint256 indexed proposalId);
+    event VestedTokensReleased(address indexed beneficiary, uint256 amount);
+    event Blacklisted(address indexed account, bool status);
+    event FeeDiscountUpdated(address indexed account, uint256 discount);
+    event VIPTierUpdated(address indexed account, uint8 tier);
 
     // ===== Functions =====
     function mint(address to, uint256 amount, string calldata purpose) external;
@@ -43,5 +45,5 @@ interface ITestToken is IERC20 {
     error VestingAlreadyReleased();
     error Unauthorized();
     error ContractPaused();
-    error Blacklisted();
+    error AccountBlacklisted();
 }
