@@ -129,12 +129,7 @@ npx hardhat run scripts/deploy-tokenhub-v2.js --network bscTestnet
 ```
 smartfolder3/
 ├── contracts/
-│   ├── TokenHubV2.sol         # Modular token contract
-│   ├── ITokenHub.sol          # Interface
-│   ├── modules/               # Modular architecture
-│   │   ├── VestingModuleV2.sol    # Vesting functionality
-│   │   ├── StakingModuleV2.sol    # Staking functionality
-│   │   └── GovernanceModuleV2.sol # Governance functionality
+│   └── TokenHubV2.sol         # Simple ERC-20 token contract
 ├── scripts/
 │   └── deploy-tokenhub-v2.js  # Deploy modular TokenHub V2
 ├── test/                      # Test files

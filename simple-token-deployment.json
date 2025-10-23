@@ -1,19 +1,18 @@
 {
-  "contractAddress": "0xbB395c1aa24Ed80F864036A709626f0BFd85adF1",
+  "contractAddress": "0x5A6d5C13dE0AeC7d3640Eef12b7F81E37Dcb08b0",
   "deployer": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
+  "owner": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
   "network": "bscTestnet",
   "chainId": "97",
-  "deploymentTime": "2025-10-23T04:42:57.833Z",
+  "deploymentTime": "2025-10-23T08:52:42.941Z",
   "tokenInfo": {
     "name": "Token Hub",
     "symbol": "THD",
     "decimals": "18",
-    "totalSupply": "100000000.0"
+    "totalSupply": "100000000.0",
+    "initialSupply": "100000000.0"
   },
   "features": {
-    "mintingEnabled": true,
-    "burningEnabled": true,
-    "totalBurned": "0.0",
     "deployerBalance": "100000000.0"
   }
 }

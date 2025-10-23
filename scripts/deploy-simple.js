@@ -1,11 +1,11 @@
 const hre = require("hardhat");
 
 /**
- * 🚀 Utility & Governance Token Deployment Script for BSC Testnet
- * Deploys a utility and governance token for exchange listing (Default Mint, Burn Allowed)
+ * 🚀 Simple Token Deployment Script for BSC Testnet
+ * Deploys a simple ERC-20 token with permit functionality
  */
 async function main() {
-    console.log("🚀 ===== DEPLOYING UTILITY & GOVERNANCE TOKEN TO BSC TESTNET =====");
+    console.log("🚀 ===== DEPLOYING SIMPLE TOKEN TO BSC TESTNET =====");
     console.log("📅 Deployment Time:", new Date().toISOString());
 
     // Get deployer account
@@ -25,15 +25,15 @@ async function main() {
 
     console.log("\n🔨 ===== DEPLOYING CONTRACT =====");
     
-    // Deploy Utility & Governance Token
+    // Deploy Simple Token
     const TokenHubV2 = await hre.ethers.getContractFactory("TokenHubV2");
-    console.log("📦 Deploying Utility & Governance Token...");
+    console.log("📦 Deploying Simple Token...");
     
     const token = await TokenHubV2.deploy(deployer.address);
     await token.waitForDeployment();
     
     const contractAddress = await token.getAddress();
-    console.log("✅ Utility & Governance Token deployed at:", contractAddress);
+    console.log("✅ Simple Token deployed at:", contractAddress);
 
     // Wait for confirmation
     console.log("⏳ Waiting for confirmation...");
@@ -46,35 +46,26 @@ async function main() {
     const symbol = await token.symbol();
     const decimals = await token.decimals();
     const totalSupply = await token.totalSupply();
+    const initialSupply = await token.INITIAL_SUPPLY();
+    const owner = await token.owner();
     
     console.log("📋 Token Name:", name);
     console.log("🪙 Token Symbol:", symbol);
     console.log("🔢 Decimals:", decimals.toString());
     console.log("📈 Total Supply:", hre.ethers.formatUnits(totalSupply, 18), "THD");
-    console.log("👑 Admin:", deployer.address);
-    console.log("🎯 Token Type: Utility & Governance Token");
+    console.log("📈 Initial Supply:", hre.ethers.formatUnits(initialSupply, 18), "THD");
+    console.log("👑 Owner:", owner);
 
     console.log("\n🔧 ===== CONTRACT FEATURES =====");
     
     // Test basic features
-    const tokenInfo = await token.getTokenInfo();
     const deployerBalance = await token.balanceOf(deployer.address);
     
-    console.log("✅ Minting Enabled:", tokenInfo.mintingEnabled_);
-    console.log("✅ Burning Enabled:", tokenInfo.burningEnabled_);
-    console.log("✅ Total Burned:", hre.ethers.formatUnits(tokenInfo.totalBurned_, 18), "THD");
-    console.log("✅ Deployer Balance:", hre.ethers.formatUnits(deployerBalance, 18), "THD");
     console.log("✅ ERC-20 Standard: Full Compliance");
-    console.log("✅ Access Control: Admin and Burner roles");
-    console.log("✅ Pause Mechanism: Emergency pause available");
-
-    console.log("\n🎯 ===== UTILITY & GOVERNANCE FEATURES =====");
-    console.log("✅ Utility Token: Can be used for platform services");
-    console.log("✅ Governance Token: Voting power based on token balance");
-    console.log("✅ Exchange Listing: Ready for trading on exchanges");
-    console.log("✅ Standard Compliance: ERC-20 (BEP-20 Compatible)");
-    console.log("✅ Default Minting: Standard ERC20 minting available");
-    console.log("✅ Burning Allowed: Can burn tokens to reduce supply");
+    console.log("✅ ERC-20 Permit: Gasless approvals");
+    console.log("✅ Ownable: Owner-based access control");
+    console.log("✅ Burning: Users can burn their tokens");
+    console.log("✅ Deployer Balance:", hre.ethers.formatUnits(deployerBalance, 18), "THD");
 
     console.log("\n🌐 ===== NETWORK INFORMATION =====");
     const network = await hre.ethers.provider.getNetwork();
@@ -85,11 +76,10 @@ async function main() {
 
     console.log("\n📋 ===== DEPLOYMENT SUMMARY =====");
     console.log("✅ Contract deployed successfully!");
-    console.log("✅ Utility & Governance token ready for exchange listing");
+    console.log("✅ Simple ERC-20 token ready for exchange listing");
     console.log("✅ All basic features working correctly");
-    console.log("✅ Admin role assigned");
-    console.log("✅ Default minting - burning allowed");
-    console.log("✅ Ready for trading and governance!");
+    console.log("✅ Owner role assigned");
+    console.log("✅ Ready for trading!");
 
     console.log("\n🎯 ===== NEXT STEPS =====");
     console.log("1. 📝 Save contract address:", contractAddress);
@@ -97,12 +87,12 @@ async function main() {
     console.log("3. 🔍 Verify on BSCScan:", `https://testnet.bscscan.com/address/${contractAddress}`);
     console.log("4. 📊 Check token info on BSCScan");
     console.log("5. 🚀 Submit for exchange listing!");
-    console.log("6. 🗳️ Set up governance system for voting!");
 
     // Save deployment info to file
     const deploymentInfo = {
         contractAddress: contractAddress,
         deployer: deployer.address,
+        owner: owner,
         network: network.name,
         chainId: network.chainId.toString(),
         deploymentTime: new Date().toISOString(),
@@ -111,24 +101,20 @@ async function main() {
             symbol: symbol,
             decimals: decimals.toString(),
             totalSupply: hre.ethers.formatUnits(totalSupply, 18),
-            type: "Utility & Governance Token (Default Mint, Burn Allowed)"
+            initialSupply: hre.ethers.formatUnits(initialSupply, 18)
         },
         features: {
-            mintingEnabled: tokenInfo.mintingEnabled_,
-            burningEnabled: tokenInfo.burningEnabled_,
-            totalBurned: hre.ethers.formatUnits(tokenInfo.totalBurned_, 18),
             deployerBalance: hre.ethers.formatUnits(deployerBalance, 18)
         }
     };
 
     const fs = require('fs');
-    fs.writeFileSync('utility-governance-token-deployment.json', JSON.stringify(deploymentInfo, null, 2));
-    console.log("\n💾 Deployment info saved to utility-governance-token-deployment.json");
+    fs.writeFileSync('simple-token-deployment.json', JSON.stringify(deploymentInfo, null, 2));
+    console.log("\n💾 Deployment info saved to simple-token-deployment.json");
 
     console.log("\n🎉 ===== DEPLOYMENT COMPLETED =====");
-    console.log("🚀 Utility & Governance Token is now live on BSC Testnet!");
-    console.log("📈 Ready for exchange listing and governance!");
-    console.log("🔥 Default minting - burning allowed!");
+    console.log("🚀 Simple Token is now live on BSC Testnet!");
+    console.log("📈 Ready for exchange listing!");
 }
 
 main().catch((error) => {
