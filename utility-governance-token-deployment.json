@@ -1,0 +1,20 @@
+{
+  "contractAddress": "0xf6545572455d8ee90D29e7D7DC4bfBFb06145c11",
+  "deployer": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
+  "network": "bscTestnet",
+  "chainId": "97",
+  "deploymentTime": "2025-10-23T06:13:12.965Z",
+  "tokenInfo": {
+    "name": "Token Hub",
+    "symbol": "THD",
+    "decimals": "18",
+    "totalSupply": "100000000.0",
+    "type": "Utility & Governance Token (Default Mint, Burn Allowed)"
+  },
+  "features": {
+    "mintingEnabled": true,
+    "burningEnabled": true,
+    "totalBurned": "0.0",
+    "deployerBalance": "100000000.0"
+  }
+}

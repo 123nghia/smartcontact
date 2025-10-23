@@ -1,11 +1,11 @@
 const hre = require("hardhat");
 
 /**
- * 🚀 Simple Token Deployment Script for BSC Testnet
- * Deploys a simple ERC-20 token for exchange listing
+ * 🚀 Utility & Governance Token Deployment Script for BSC Testnet
+ * Deploys a utility and governance token for exchange listing (Default Mint, Burn Allowed)
  */
 async function main() {
-    console.log("🚀 ===== DEPLOYING SIMPLE TOKEN TO BSC TESTNET =====");
+    console.log("🚀 ===== DEPLOYING UTILITY & GOVERNANCE TOKEN TO BSC TESTNET =====");
     console.log("📅 Deployment Time:", new Date().toISOString());
 
     // Get deployer account
@@ -25,15 +25,15 @@ async function main() {
 
     console.log("\n🔨 ===== DEPLOYING CONTRACT =====");
     
-    // Deploy Simple Token
+    // Deploy Utility & Governance Token
     const TokenHubV2 = await hre.ethers.getContractFactory("TokenHubV2");
-    console.log("📦 Deploying Simple Token...");
+    console.log("📦 Deploying Utility & Governance Token...");
     
     const token = await TokenHubV2.deploy(deployer.address);
     await token.waitForDeployment();
     
     const contractAddress = await token.getAddress();
-    console.log("✅ Simple Token deployed at:", contractAddress);
+    console.log("✅ Utility & Governance Token deployed at:", contractAddress);
 
     // Wait for confirmation
     console.log("⏳ Waiting for confirmation...");
@@ -52,30 +52,7 @@ async function main() {
     console.log("🔢 Decimals:", decimals.toString());
     console.log("📈 Total Supply:", hre.ethers.formatUnits(totalSupply, 18), "THD");
     console.log("👑 Admin:", deployer.address);
-
-    console.log("\n📊 ===== TOKEN ALLOCATION (Reference Only) =====");
-    
-    // Get allocation constants (for reference)
-    const teamAllocation = await token.TEAM_ALLOCATION();
-    const nodeOGAllocation = await token.NODE_OG_ALLOCATION();
-    const liquidityAllocation = await token.LIQUIDITY_ALLOCATION();
-    const communityAllocation = await token.COMMUNITY_ALLOCATION();
-    const stakingAllocation = await token.STAKING_ALLOCATION();
-    const ecosystemAllocation = await token.ECOSYSTEM_ALLOCATION();
-    const treasuryAllocation = await token.TREASURY_ALLOCATION();
-    
-    console.log("👥 Team & Advisors:", hre.ethers.formatUnits(teamAllocation, 18), "THD (7%)");
-    console.log("🌟 Node OG:", hre.ethers.formatUnits(nodeOGAllocation, 18), "THD (3%)");
-    console.log("💧 Liquidity & Market Making:", hre.ethers.formatUnits(liquidityAllocation, 18), "THD (15%)");
-    console.log("🎯 Community & Marketing:", hre.ethers.formatUnits(communityAllocation, 18), "THD (20%)");
-    console.log("🔒 Staking & Rewards:", hre.ethers.formatUnits(stakingAllocation, 18), "THD (10%)");
-    console.log("🌐 Ecosystem & Partnerships:", hre.ethers.formatUnits(ecosystemAllocation, 18), "THD (25%)");
-    console.log("🏦 Treasury / Reserve Fund:", hre.ethers.formatUnits(treasuryAllocation, 18), "THD (20%)");
-    
-    const totalAllocation = teamAllocation + nodeOGAllocation + liquidityAllocation + 
-                          communityAllocation + stakingAllocation + ecosystemAllocation + 
-                          treasuryAllocation;
-    console.log("📊 TỔNG CỘNG:", hre.ethers.formatUnits(totalAllocation, 18), "THD (100%)");
+    console.log("🎯 Token Type: Utility & Governance Token");
 
     console.log("\n🔧 ===== CONTRACT FEATURES =====");
     
@@ -88,7 +65,16 @@ async function main() {
     console.log("✅ Total Burned:", hre.ethers.formatUnits(tokenInfo.totalBurned_, 18), "THD");
     console.log("✅ Deployer Balance:", hre.ethers.formatUnits(deployerBalance, 18), "THD");
     console.log("✅ ERC-20 Standard: Full Compliance");
-    console.log("✅ Access Control: Role-based permissions");
+    console.log("✅ Access Control: Admin and Burner roles");
+    console.log("✅ Pause Mechanism: Emergency pause available");
+
+    console.log("\n🎯 ===== UTILITY & GOVERNANCE FEATURES =====");
+    console.log("✅ Utility Token: Can be used for platform services");
+    console.log("✅ Governance Token: Voting power based on token balance");
+    console.log("✅ Exchange Listing: Ready for trading on exchanges");
+    console.log("✅ Standard Compliance: ERC-20 (BEP-20 Compatible)");
+    console.log("✅ Default Minting: Standard ERC20 minting available");
+    console.log("✅ Burning Allowed: Can burn tokens to reduce supply");
 
     console.log("\n🌐 ===== NETWORK INFORMATION =====");
     const network = await hre.ethers.provider.getNetwork();
@@ -99,10 +85,11 @@ async function main() {
 
     console.log("\n📋 ===== DEPLOYMENT SUMMARY =====");
     console.log("✅ Contract deployed successfully!");
-    console.log("✅ Simple ERC-20 token ready for exchange listing");
+    console.log("✅ Utility & Governance token ready for exchange listing");
     console.log("✅ All basic features working correctly");
     console.log("✅ Admin role assigned");
-    console.log("✅ Ready for trading!");
+    console.log("✅ Default minting - burning allowed");
+    console.log("✅ Ready for trading and governance!");
 
     console.log("\n🎯 ===== NEXT STEPS =====");
     console.log("1. 📝 Save contract address:", contractAddress);
@@ -110,6 +97,7 @@ async function main() {
     console.log("3. 🔍 Verify on BSCScan:", `https://testnet.bscscan.com/address/${contractAddress}`);
     console.log("4. 📊 Check token info on BSCScan");
     console.log("5. 🚀 Submit for exchange listing!");
+    console.log("6. 🗳️ Set up governance system for voting!");
 
     // Save deployment info to file
     const deploymentInfo = {
@@ -122,7 +110,8 @@ async function main() {
             name: name,
             symbol: symbol,
             decimals: decimals.toString(),
-            totalSupply: hre.ethers.formatUnits(totalSupply, 18)
+            totalSupply: hre.ethers.formatUnits(totalSupply, 18),
+            type: "Utility & Governance Token (Default Mint, Burn Allowed)"
         },
         features: {
             mintingEnabled: tokenInfo.mintingEnabled_,
@@ -133,12 +122,13 @@ async function main() {
     };
 
     const fs = require('fs');
-    fs.writeFileSync('simple-token-deployment.json', JSON.stringify(deploymentInfo, null, 2));
-    console.log("\n💾 Deployment info saved to simple-token-deployment.json");
+    fs.writeFileSync('utility-governance-token-deployment.json', JSON.stringify(deploymentInfo, null, 2));
+    console.log("\n💾 Deployment info saved to utility-governance-token-deployment.json");
 
     console.log("\n🎉 ===== DEPLOYMENT COMPLETED =====");
-    console.log("🚀 Simple Token is now live on BSC Testnet!");
-    console.log("📈 Ready for exchange listing!");
+    console.log("🚀 Utility & Governance Token is now live on BSC Testnet!");
+    console.log("📈 Ready for exchange listing and governance!");
+    console.log("🔥 Default minting - burning allowed!");
 }
 
 main().catch((error) => {

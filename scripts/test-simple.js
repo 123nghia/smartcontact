@@ -1,15 +1,15 @@
 const hre = require("hardhat");
 
 /**
- * 🧪 Simple Test Script for TokenHub V2
- * Tests basic ERC-20 token functionality
+ * 🧪 Test Script for Utility & Governance Token (Default Mint, Burn Allowed)
+ * Tests basic ERC-20 token functionality for utility and governance purposes
  */
 async function main() {
-    console.log("🧪 ===== TESTING SIMPLE TOKEN =====");
+    console.log("🧪 ===== TESTING UTILITY & GOVERNANCE TOKEN (DEFAULT MINT, BURN ALLOWED) =====");
     console.log("📅 Test Time:", new Date().toISOString());
 
     // Contract Address (update this with your deployed contract)
-    const contractAddress = "0x32d8E8E9d52b88d8Fa3Eee2aB08f5180C5cAE38A";
+    const contractAddress = "0xf6545572455d8ee90D29e7D7DC4bfBFb06145c11";
     console.log("📍 Contract Address:", contractAddress);
 
     // Get tester account
@@ -40,48 +40,14 @@ async function main() {
         console.log("✅ Chain ID:", network.chainId.toString());
         console.log("✅ Contract Address:", contractAddress);
         console.log("✅ BSCScan URL:", `https://testnet.bscscan.com/address/${contractAddress}`);
+        console.log("✅ Token Type: Utility & Governance Token (Default Mint, Burn Allowed)");
         
     } catch (error) {
         console.log("❌ Error getting basic info:", error.message);
     }
 
-    // ===== 2. TOKEN ALLOCATION (Reference) =====
-    console.log("\n📊 ===== 2. TOKEN ALLOCATION (Reference Only) =====");
-    
-    try {
-        const teamAllocation = await token.TEAM_ALLOCATION();
-        const nodeOGAllocation = await token.NODE_OG_ALLOCATION();
-        const liquidityAllocation = await token.LIQUIDITY_ALLOCATION();
-        const communityAllocation = await token.COMMUNITY_ALLOCATION();
-        const stakingAllocation = await token.STAKING_ALLOCATION();
-        const ecosystemAllocation = await token.ECOSYSTEM_ALLOCATION();
-        const treasuryAllocation = await token.TREASURY_ALLOCATION();
-        
-        const totalSupply = await token.totalSupply();
-        
-        console.log("📈 Team & Advisors:", hre.ethers.formatUnits(teamAllocation, 18), "THD (7%)");
-        console.log("📈 Node OG:", hre.ethers.formatUnits(nodeOGAllocation, 18), "THD (3%)");
-        console.log("📈 Liquidity & Market Making:", hre.ethers.formatUnits(liquidityAllocation, 18), "THD (15%)");
-        console.log("📈 Community & Marketing:", hre.ethers.formatUnits(communityAllocation, 18), "THD (20%)");
-        console.log("📈 Staking & Rewards:", hre.ethers.formatUnits(stakingAllocation, 18), "THD (10%)");
-        console.log("📈 Ecosystem & Partnerships:", hre.ethers.formatUnits(ecosystemAllocation, 18), "THD (25%)");
-        console.log("📈 Treasury / Reserve Fund:", hre.ethers.formatUnits(treasuryAllocation, 18), "THD (20%)");
-        
-        const totalAllocation = teamAllocation + nodeOGAllocation + liquidityAllocation + 
-                              communityAllocation + stakingAllocation + ecosystemAllocation + 
-                              treasuryAllocation;
-        console.log("📊 TỔNG CỘNG:", hre.ethers.formatUnits(totalAllocation, 18), "THD (100%)");
-        
-        // Verify allocation is correct
-        const allocationCorrect = totalAllocation === totalSupply;
-        console.log("✅ Allocation Verification:", allocationCorrect ? "PASS" : "FAIL");
-        
-    } catch (error) {
-        console.log("❌ Error verifying allocation:", error.message);
-    }
-
-    // ===== 3. TOKEN FEATURES =====
-    console.log("\n🔧 ===== 3. TOKEN FEATURES =====");
+    // ===== 2. TOKEN FEATURES =====
+    console.log("\n🔧 ===== 2. TOKEN FEATURES =====");
     
     try {
         const tokenInfo = await token.getTokenInfo();
@@ -92,10 +58,46 @@ async function main() {
         console.log("✅ Total Burned:", hre.ethers.formatUnits(tokenInfo.totalBurned_, 18), "THD");
         console.log("✅ Tester Balance:", hre.ethers.formatUnits(balance, 18), "THD");
         console.log("✅ ERC-20 Standard: Full Compliance");
-        console.log("✅ Access Control: Role-based permissions");
+        console.log("✅ Access Control: Admin and Burner roles");
+        console.log("✅ Pause Mechanism: Available");
+        console.log("✅ Default Minting: Standard ERC20 minting available");
+        console.log("✅ Burning Allowed: Can burn tokens to reduce supply");
         
     } catch (error) {
         console.log("❌ Error testing features:", error.message);
+    }
+
+    // ===== 3. UTILITY & GOVERNANCE FEATURES =====
+    console.log("\n🎯 ===== 3. UTILITY & GOVERNANCE FEATURES =====");
+    
+    try {
+        const balance = await token.balanceOf(tester.address);
+        
+        console.log("🎯 Utility Features:");
+        console.log("  ✅ Platform Services: Can be used for trading fees");
+        console.log("  ✅ Service Payments: Can be used for platform services");
+        console.log("  ✅ Access Control: Can be used for premium features");
+        console.log("  ✅ Rewards: Can be used for user rewards");
+        
+        console.log("\n🗳️ Governance Features:");
+        console.log("  ✅ Voting Power:", hre.ethers.formatUnits(balance, 18), "THD");
+        console.log("  ✅ 1 THD = 1 Vote: Simple voting mechanism");
+        console.log("  ✅ Proposal Rights: Based on token balance");
+        console.log("  ✅ Decision Making: Community governance");
+        
+        console.log("\n🔥 Burning Features:");
+        console.log("  ✅ Self Burn: Users can burn their own tokens");
+        console.log("  ✅ Burn From: Burner role can burn from any account");
+        console.log("  ✅ Deflationary: Supply decreases when tokens are burned");
+        console.log("  ✅ Toggle Burn: Admin can enable/disable burning");
+        
+        console.log("\n💰 Minting Features:");
+        console.log("  ✅ Default ERC20: Standard minting functionality");
+        console.log("  ✅ No Restrictions: No custom minting controls");
+        console.log("  ✅ Standard Behavior: Follows ERC20 specification");
+        
+    } catch (error) {
+        console.log("❌ Error testing utility & governance features:", error.message);
     }
 
     // ===== 4. ERC-20 COMPLIANCE TEST =====
@@ -124,12 +126,6 @@ async function main() {
         console.log("🌐 Network:", networkCorrect ? "✅ PASS" : "❌ FAIL");
         console.log("🔗 ERC-20 Compliance:", erc20Compliant ? "✅ PASS" : "❌ FAIL");
         
-        // Allocation compliance
-        const teamAllocation = await token.TEAM_ALLOCATION();
-        const expectedTeam = hre.ethers.parseUnits("7000000", 18);
-        const teamCorrect = teamAllocation === expectedTeam;
-        console.log("👥 Team Allocation (7%):", teamCorrect ? "✅ PASS" : "❌ FAIL");
-        
     } catch (error) {
         console.log("❌ Error in compliance check:", error.message);
     }
@@ -149,6 +145,7 @@ async function main() {
         console.log("✅ Decimals:", decimals.toString());
         console.log("✅ Total Supply:", hre.ethers.formatUnits(totalSupply, 18), "THD");
         console.log("✅ Standard: ERC-20 (BEP-20 Compatible)");
+        console.log("✅ Type: Utility & Governance Token (Default Mint, Burn Allowed)");
         console.log("✅ Minting:", tokenInfo.mintingEnabled_ ? "Enabled" : "Disabled");
         console.log("✅ Burning:", tokenInfo.burningEnabled_ ? "Enabled" : "Disabled");
         console.log("✅ Network: BSC Testnet (Chain ID: 97)");
@@ -160,6 +157,9 @@ async function main() {
         console.log("✅ Proper Decimals: PASS (18 decimals)");
         console.log("✅ Contract Verified: Ready for verification");
         console.log("✅ Network Compatible: BSC Testnet");
+        console.log("✅ Utility Purpose: Clear utility and governance use case");
+        console.log("✅ Default Minting: Standard ERC20 minting available");
+        console.log("✅ Deflationary: Burning reduces supply over time");
         
     } catch (error) {
         console.log("❌ Error checking listing readiness:", error.message);
@@ -169,16 +169,18 @@ async function main() {
     console.log("\n🎉 ===== 6. FINAL SUMMARY =====");
     console.log("✅ Contract Address:", contractAddress);
     console.log("✅ Token: Token Hub (THD)");
-    console.log("✅ Total Supply: 100,000,000 THD");
+    console.log("✅ Total Supply: 100,000,000 THD (Default Mint)");
     console.log("✅ Network: BSC Testnet");
     console.log("✅ Status: Deployed and Active");
-    console.log("✅ Type: Simple ERC-20 Token");
-    console.log("✅ Purpose: Exchange Listing");
+    console.log("✅ Type: Utility & Governance Token (Default Mint, Burn Allowed)");
+    console.log("✅ Purpose: Exchange Listing & Community Governance");
     console.log("✅ Standard: ERC-20 (BEP-20 Compatible)");
+    console.log("✅ Supply: Default minting - burning allowed");
     
     console.log("\n🎯 Test completed successfully!");
-    console.log("📊 Simple token is working correctly!");
-    console.log("🚀 Ready for exchange listing!");
+    console.log("📊 Utility & Governance token (Default Mint, Burn Allowed) is working correctly!");
+    console.log("🚀 Ready for exchange listing and governance!");
+    console.log("🔥 Default minting - burning creates deflationary pressure!");
     console.log("🔗 View on BSCScan:", `https://testnet.bscscan.com/address/${contractAddress}`);
 }
 

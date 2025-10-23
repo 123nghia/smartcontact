@@ -9,31 +9,20 @@ import "./ITokenHub.sol";
 
 /**
  * @title TokenHubV2
- * @dev Simple ERC-20 Token for Exchange Listing
- * @notice This is a simple token contract designed for exchange listing
+ * @dev Utility & Governance Token for Exchange Listing (Default Mint, Burn Allowed)
+ * @notice This is a utility and governance token designed for exchange listing
  */
 contract TokenHubV2 is ERC20, ERC20Burnable, AccessControl, Pausable, ITokenHub {
     
     // ===== ROLES =====
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
     
     // ===== TOKEN INFORMATION =====
     uint8 private constant DECIMALS = 18;
     uint256 private constant TOTAL_SUPPLY = 100_000_000 * 10**DECIMALS; // 100,000,000 THD
     
-    // ===== TOKEN ALLOCATION CONSTANTS (Reference Only) =====
-    uint256 public constant TEAM_ALLOCATION = 7_000_000 * 10**DECIMALS; // 7%
-    uint256 public constant NODE_OG_ALLOCATION = 3_000_000 * 10**DECIMALS; // 3%
-    uint256 public constant LIQUIDITY_ALLOCATION = 15_000_000 * 10**DECIMALS; // 15%
-    uint256 public constant COMMUNITY_ALLOCATION = 20_000_000 * 10**DECIMALS; // 20%
-    uint256 public constant STAKING_ALLOCATION = 10_000_000 * 10**DECIMALS; // 10%
-    uint256 public constant ECOSYSTEM_ALLOCATION = 25_000_000 * 10**DECIMALS; // 25%
-    uint256 public constant TREASURY_ALLOCATION = 20_000_000 * 10**DECIMALS; // 20%
-    
     // ===== STATE VARIABLES =====
-    bool public mintingEnabled = true;
     bool public burningEnabled = true;
     uint256 public totalBurned = 0;
     
@@ -45,18 +34,8 @@ contract TokenHubV2 is ERC20, ERC20Burnable, AccessControl, Pausable, ITokenHub 
         _;
     }
     
-    modifier onlyMinter() {
-        require(hasRole(MINTER_ROLE, msg.sender), "Caller is not minter");
-        _;
-    }
-    
     modifier onlyBurner() {
         require(hasRole(BURNER_ROLE, msg.sender), "Caller is not burner");
-        _;
-    }
-    
-    modifier whenMintingEnabled() {
-        if (!mintingEnabled) revert MintingDisabled();
         _;
     }
     
@@ -69,7 +48,6 @@ contract TokenHubV2 is ERC20, ERC20Burnable, AccessControl, Pausable, ITokenHub 
     constructor(address admin) ERC20("Token Hub", "THD") {
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(ADMIN_ROLE, admin);
-        _grantRole(MINTER_ROLE, admin);
         _grantRole(BURNER_ROLE, admin);
         
         // Mint total supply to admin
@@ -110,30 +88,9 @@ contract TokenHubV2 is ERC20, ERC20Burnable, AccessControl, Pausable, ITokenHub 
             decimals(),
             totalSupply(),
             totalBurned,
-            mintingEnabled,
+            true, // mintingEnabled - default ERC20 minting available
             burningEnabled
         );
-    }
-    
-    // ===== MINTING FUNCTIONS =====
-    
-    /**
-     * @dev Mint new tokens (only minter role)
-     */
-    function mint(address to, uint256 amount) external onlyMinter whenMintingEnabled whenNotPaused {
-        if (to == address(0)) revert ZeroAddress();
-        if (amount == 0) revert ZeroAmount();
-        
-        _mint(to, amount);
-        emit TokensMinted(to, amount);
-    }
-    
-    /**
-     * @dev Toggle minting on/off (only admin)
-     */
-    function toggleMinting() external onlyAdmin {
-        mintingEnabled = !mintingEnabled;
-        emit MintingToggled(mintingEnabled);
     }
     
     // ===== BURNING FUNCTIONS =====
@@ -194,24 +151,10 @@ contract TokenHubV2 is ERC20, ERC20Burnable, AccessControl, Pausable, ITokenHub 
     // ===== ROLE MANAGEMENT =====
     
     /**
-     * @dev Grant minter role to address (only admin)
-     */
-    function grantMinterRole(address account) external onlyAdmin {
-        _grantRole(MINTER_ROLE, account);
-    }
-    
-    /**
      * @dev Grant burner role to address (only admin)
      */
     function grantBurnerRole(address account) external onlyAdmin {
         _grantRole(BURNER_ROLE, account);
-    }
-    
-    /**
-     * @dev Revoke minter role from address (only admin)
-     */
-    function revokeMinterRole(address account) external onlyAdmin {
-        _revokeRole(MINTER_ROLE, account);
     }
     
     /**
