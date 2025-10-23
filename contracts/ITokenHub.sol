@@ -4,46 +4,64 @@ pragma solidity ^0.8.28;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title Token Hub Interface
-/// @notice Interface chính cho Token Hub ecosystem
+/// @notice Interface cho Simple ERC-20 Token
 interface ITokenHub is IERC20 {
     // ===== Events =====
-    event TokensMinted(address indexed to, uint256 amount, string purpose);
-    event TokensBurned(address indexed from, uint256 amount, string purpose);
-    event TokensTransferred(address indexed from, address indexed to, uint256 amount);
-    event TokensStaked(address indexed user, uint256 amount, uint256 lockDuration);
-    event TokensUnstaked(address indexed user, uint256 amount);
-    event StakingRewardsClaimed(address indexed user, uint256 amount);
-    event VoteCast(address indexed voter, uint256 proposalId, bool support, uint256 weight);
-    event ProposalCreated(uint256 indexed proposalId, address proposer, string description);
-    event ProposalExecuted(uint256 indexed proposalId);
-    event VestedTokensReleased(address indexed beneficiary, uint256 amount);
-    event Blacklisted(address indexed account, bool status);
-    event FeeDiscountUpdated(address indexed account, uint256 discount);
-    event VIPTierUpdated(address indexed account, uint8 tier);
+    event TokensMinted(address indexed to, uint256 amount);
+    event TokensBurned(address indexed from, uint256 amount);
+    event MintingToggled(bool enabled);
+    event BurningToggled(bool enabled);
+    event TokensBlacklisted(address indexed account, bool blacklisted);
 
-    // ===== Functions =====
-    function mint(address to, uint256 amount, string calldata purpose) external;
+    // ===== Token Information =====
+    function getTokenInfo() external view returns (
+        string memory name_,
+        string memory symbol_,
+        uint8 decimals_,
+        uint256 totalSupply_,
+        uint256 totalBurned_,
+        bool mintingEnabled_,
+        bool burningEnabled_
+    );
+
+    // ===== Minting Functions =====
+    function mint(address to, uint256 amount) external;
+    function toggleMinting() external;
+
+    // ===== Burning Functions =====
     function burn(uint256 amount) external;
     function burnFrom(address account, uint256 amount) external;
+    function toggleBurning() external;
+
+    // ===== Pause Functions =====
+    function pause() external;
+    function unpause() external;
+
+    // ===== Role Management =====
+    function grantMinterRole(address account) external;
+    function grantBurnerRole(address account) external;
+    function revokeMinterRole(address account) external;
+    function revokeBurnerRole(address account) external;
+
+    // ===== Token Allocation Constants (Reference Only) =====
+    function TEAM_ALLOCATION() external view returns (uint256);
+    function NODE_OG_ALLOCATION() external view returns (uint256);
+    function LIQUIDITY_ALLOCATION() external view returns (uint256);
+    function COMMUNITY_ALLOCATION() external view returns (uint256);
+    function STAKING_ALLOCATION() external view returns (uint256);
+    function ECOSYSTEM_ALLOCATION() external view returns (uint256);
+    function TREASURY_ALLOCATION() external view returns (uint256);
+
+    // ===== State Variables =====
+    function mintingEnabled() external view returns (bool);
+    function burningEnabled() external view returns (bool);
+    function totalBurned() external view returns (uint256);
 
     // ===== Errors =====
     error ZeroAddress();
     error ZeroAmount();
     error InsufficientBalance();
     error InsufficientAllowance();
-    error TransferFailed();
     error MintingDisabled();
     error BurningDisabled();
-    error StakingNotActive();
-    error StakingAlreadyActive();
-    error InvalidDuration();
-    error ProposalNotFound();
-    error VotingEnded();
-    error AlreadyVoted();
-    error InsufficientVotingPower();
-    error VestingNotStarted();
-    error VestingAlreadyReleased();
-    error Unauthorized();
-    error ContractPaused();
-    error AccountBlacklisted();
 }
