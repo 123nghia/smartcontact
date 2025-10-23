@@ -1,0 +1,24 @@
+{
+  "contractAddress": "0x355DaC39c439B2d849163011f5267F2438fa62Fb",
+  "deployer": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
+  "network": "bscTestnet",
+  "chainId": "97",
+  "deploymentTime": "2025-10-22T04:18:31.193Z",
+  "tokenInfo": {
+    "name": "Token Hub",
+    "symbol": "THD",
+    "decimals": "18",
+    "totalSupply": "100000000.0"
+  },
+  "allocation": {
+    "team": "7000000.0",
+    "nodeOG": "3000000.0",
+    "liquidity": "15000000.0",
+    "community": "20000000.0",
+    "staking": "10000000.0",
+    "ecosystem": "25000000.0",
+    "treasury": "20000000.0"
+  },
+  "tgeRelease": "16800000.0",
+  "tgePercentage": "16"
+}
