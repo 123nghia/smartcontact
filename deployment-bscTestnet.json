@@ -1,0 +1,63 @@
+{
+  "network": "bscTestnet",
+  "deploymentTime": "2025-10-24T07:29:31.858Z",
+  "tokenVesting": {
+    "address": "0x2FB6922ce320E54511Ca1DBD1802609A52698Dd6",
+    "deployer": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
+    "tokenAddress": "0x5a504aF4996f863502493A05E41d9b75925f76F9",
+    "transactionHash": "0x0e733257a54f2bd06e6ff408b1d16a4b05948c2e9149a9fca8131823b2d7d350",
+    "gasUsed": "1026882",
+    "gasPrice": "0.1 Gwei"
+  },
+  "vestingSchedules": {
+    "Team & Advisors": {
+      "totalAllocation": "7000000.0",
+      "tgeRelease": "0.0%",
+      "cliffPeriod": "180 days",
+      "vestingDuration": "1080 days",
+      "isActive": true
+    },
+    "Node OG": {
+      "totalAllocation": "3000000.0",
+      "tgeRelease": "10.0%",
+      "cliffPeriod": "0 days",
+      "vestingDuration": "720 days",
+      "isActive": true
+    },
+    "Liquidity & Market Making": {
+      "totalAllocation": "15000000.0",
+      "tgeRelease": "40.0%",
+      "cliffPeriod": "0 days",
+      "vestingDuration": "360 days",
+      "isActive": true
+    },
+    "Community & Marketing": {
+      "totalAllocation": "20000000.0",
+      "tgeRelease": "20.0%",
+      "cliffPeriod": "0 days",
+      "vestingDuration": "720 days",
+      "isActive": true
+    },
+    "Staking & Rewards": {
+      "totalAllocation": "10000000.0",
+      "tgeRelease": "0.0%",
+      "cliffPeriod": "0 days",
+      "vestingDuration": "1080 days",
+      "isActive": true
+    },
+    "Ecosystem & Partnerships": {
+      "totalAllocation": "25000000.0",
+      "tgeRelease": "10.0%",
+      "cliffPeriod": "0 days",
+      "vestingDuration": "900 days",
+      "isActive": true
+    },
+    "Treasury / Reserve Fund": {
+      "totalAllocation": "20000000.0",
+      "tgeRelease": "20.0%",
+      "cliffPeriod": "0 days",
+      "vestingDuration": "1440 days",
+      "isActive": true
+    }
+  }
+}
