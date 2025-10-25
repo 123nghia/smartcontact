@@ -1,0 +1,19 @@
+{
+  "network": "bscMainnet",
+  "deploymentTime": "2025-10-25T10:02:38.265Z",
+  "contractAddress": "0x8877588054610cb5449522036ff72166877578Bf",
+  "deployer": "0x2Bd6355836569002a0Ba2f83F1c595b6E686C9D0",
+  "transactionHash": "0x6bf13d80a261e8337459a33f7bd4560cf1669af905ae8de32f64665f673b6d93",
+  "gasUsed": "1266920",
+  "gasPrice": "0.05565 Gwei",
+  "totalCost": "0.000070504098 BNB",
+  "tokenInfo": {
+    "name": "Token Hub",
+    "symbol": "AIEX",
+    "decimals": "18",
+    "totalSupply": "100000000.0",
+    "owner": "0x2Bd6355836569002a0Ba2f83F1c595b6E686C9D0"
+  },
+  "bscScanUrl": "https://bscscan.com/address/0x8877588054610cb5449522036ff72166877578Bf",
+  "explorerUrl": "https://bscscan.com/tx/0x6bf13d80a261e8337459a33f7bd4560cf1669af905ae8de32f64665f673b6d93"
+}
