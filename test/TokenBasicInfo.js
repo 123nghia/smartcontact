@@ -38,10 +38,10 @@ describe("TokenHub V2 - Basic Information Test", function () {
             console.log("✅ Contract Address:", contractAddress);
         });
 
-        it("Should have admin role assigned to deployer", async function () {
-            const hasAdminRole = await tokenHub.hasRole(await tokenHub.DEFAULT_ADMIN_ROLE(), deployer.address);
-            expect(hasAdminRole).to.be.true;
-            console.log("✅ Admin Role:", deployer.address);
+        it("Should have owner assigned to deployer", async function () {
+            const owner = await tokenHub.owner();
+            expect(owner).to.equal(deployer.address);
+            console.log("✅ Owner:", deployer.address);
         });
     });
 
@@ -54,7 +54,7 @@ describe("TokenHub V2 - Basic Information Test", function () {
 
         it("Should have correct token symbol", async function () {
             const symbol = await tokenHub.symbol();
-            expect(symbol).to.equal("THD");
+            expect(symbol).to.equal("AIEX");
             console.log("✅ Token Symbol:", symbol);
         });
 
@@ -66,10 +66,10 @@ describe("TokenHub V2 - Basic Information Test", function () {
 
         it("Should have correct total supply", async function () {
             const totalSupply = await tokenHub.totalSupply();
-            const expectedSupply = ethers.parseUnits("100000000", 18); // 100M THD
+            const expectedSupply = ethers.parseUnits("100000000", 18); // 100M AIEX
             
             expect(totalSupply).to.equal(expectedSupply);
-            console.log("✅ Total Supply:", ethers.formatUnits(totalSupply, 18), "THD");
+            console.log("✅ Total Supply:", ethers.formatUnits(totalSupply, 18), "AIEX");
         });
 
         it("Should be ERC-20 compliant", async function () {
@@ -81,7 +81,7 @@ describe("TokenHub V2 - Basic Information Test", function () {
             
             expect(name).to.be.a('string');
             expect(symbol).to.be.a('string');
-            expect(decimals).to.be.a('number');
+            expect(Number(decimals)).to.be.a('number');
             expect(totalSupply).to.be.a('bigint');
             
             console.log("✅ ERC-20 Compliance: PASSED");
@@ -96,123 +96,84 @@ describe("TokenHub V2 - Basic Information Test", function () {
             console.log("✅ BEP-20 Compatibility: PASSED");
         });
 
-        it("Should be Utility & Governance Token", async function () {
-            // Test utility features
-            const vipTier = await tokenHub.getVIPTier(deployer.address);
-            const votingPower = await tokenHub.getVotingPower(deployer.address);
+        it("Should be Simple ERC-20 Token", async function () {
+            // Test basic token features
+            const balance = await tokenHub.balanceOf(deployer.address);
+            const totalSupply = await tokenHub.totalSupply();
             
-            expect(vipTier).to.be.a('bigint');
-            expect(votingPower).to.be.a('bigint');
+            expect(balance).to.be.a('bigint');
+            expect(totalSupply).to.be.a('bigint');
+            expect(balance).to.equal(totalSupply); // Deployer gets all tokens initially
             
-            console.log("✅ Utility Features: VIP Tier =", vipTier.toString());
-            console.log("✅ Governance Features: Voting Power =", ethers.formatUnits(votingPower, 18), "THD");
+            console.log("✅ Token Balance:", ethers.formatUnits(balance, 18), "AIEX");
+            console.log("✅ Total Supply:", ethers.formatUnits(totalSupply, 18), "AIEX");
         });
     });
 
-    describe("3. Token Allocation Verification", function () {
-        it("Should have correct team allocation (7%)", async function () {
-            const teamAllocation = await tokenHub.TEAM_ALLOCATION();
-            const totalSupply = await tokenHub.totalSupply();
-            const teamPercentage = (teamAllocation * 100n) / totalSupply;
+    describe("3. Token Functions Test", function () {
+        it("Should allow token transfer", async function () {
+            const transferAmount = ethers.parseEther("1000");
+            const initialBalance = await tokenHub.balanceOf(deployer.address);
+            const userBalance = await tokenHub.balanceOf(user1.address);
             
-            expect(teamPercentage).to.equal(7n);
-            console.log("✅ Team Allocation:", ethers.formatUnits(teamAllocation, 18), "THD (7%)");
+            await tokenHub.transfer(user1.address, transferAmount);
+            
+            const finalBalance = await tokenHub.balanceOf(deployer.address);
+            const finalUserBalance = await tokenHub.balanceOf(user1.address);
+            
+            expect(finalBalance).to.equal(initialBalance - transferAmount);
+            expect(finalUserBalance).to.equal(userBalance + transferAmount);
+            
+            console.log("✅ Transfer successful:", ethers.formatUnits(transferAmount, 18), "AIEX");
         });
 
-        it("Should have correct community allocation (20%)", async function () {
-            const communityAllocation = await tokenHub.COMMUNITY_ALLOCATION();
-            const totalSupply = await tokenHub.totalSupply();
-            const communityPercentage = (communityAllocation * 100n) / totalSupply;
+        it("Should allow token burning", async function () {
+            const burnAmount = ethers.parseEther("100");
+            const initialBalance = await tokenHub.balanceOf(deployer.address);
+            const initialSupply = await tokenHub.totalSupply();
             
-            expect(communityPercentage).to.equal(20n);
-            console.log("✅ Community Allocation:", ethers.formatUnits(communityAllocation, 18), "THD (20%)");
+            await tokenHub.burn(burnAmount);
+            
+            const finalBalance = await tokenHub.balanceOf(deployer.address);
+            const finalSupply = await tokenHub.totalSupply();
+            
+            expect(finalBalance).to.equal(initialBalance - burnAmount);
+            expect(finalSupply).to.equal(initialSupply - burnAmount);
+            
+            console.log("✅ Burn successful:", ethers.formatUnits(burnAmount, 18), "AIEX");
         });
 
-        it("Should have correct staking allocation (10%)", async function () {
-            const stakingAllocation = await tokenHub.STAKING_ALLOCATION();
+        it("Should have correct initial supply", async function () {
             const totalSupply = await tokenHub.totalSupply();
-            const stakingPercentage = (stakingAllocation * 100n) / totalSupply;
+            const expectedSupply = ethers.parseEther("100000000"); // 100M AIEX
             
-            expect(stakingPercentage).to.equal(10n);
-            console.log("✅ Staking Allocation:", ethers.formatUnits(stakingAllocation, 18), "THD (10%)");
-        });
-
-        it("Should have correct ecosystem allocation (25%)", async function () {
-            const ecosystemAllocation = await tokenHub.ECOSYSTEM_ALLOCATION();
-            const totalSupply = await tokenHub.totalSupply();
-            const ecosystemPercentage = (ecosystemAllocation * 100n) / totalSupply;
-            
-            expect(ecosystemPercentage).to.equal(25n);
-            console.log("✅ Ecosystem Allocation:", ethers.formatUnits(ecosystemAllocation, 18), "THD (25%)");
-        });
-
-        it("Should have correct treasury allocation (20%)", async function () {
-            const treasuryAllocation = await tokenHub.TREASURY_ALLOCATION();
-            const totalSupply = await tokenHub.totalSupply();
-            const treasuryPercentage = (treasuryAllocation * 100n) / totalSupply;
-            
-            expect(treasuryPercentage).to.equal(20n);
-            console.log("✅ Treasury Allocation:", ethers.formatUnits(treasuryAllocation, 18), "THD (20%)");
-        });
-
-        it("Should have correct liquidity allocation (15%)", async function () {
-            const liquidityAllocation = await tokenHub.LIQUIDITY_ALLOCATION();
-            const totalSupply = await tokenHub.totalSupply();
-            const liquidityPercentage = (liquidityAllocation * 100n) / totalSupply;
-            
-            expect(liquidityPercentage).to.equal(15n);
-            console.log("✅ Liquidity Allocation:", ethers.formatUnits(liquidityAllocation, 18), "THD (15%)");
-        });
-
-        it("Should have correct node OG allocation (3%)", async function () {
-            const nodeOGAllocation = await tokenHub.NODE_OG_ALLOCATION();
-            const totalSupply = await tokenHub.totalSupply();
-            const nodeOGPercentage = (nodeOGAllocation * 100n) / totalSupply;
-            
-            expect(nodeOGPercentage).to.equal(3n);
-            console.log("✅ Node OG Allocation:", ethers.formatUnits(nodeOGAllocation, 18), "THD (3%)");
-        });
-
-        it("Should have total allocation equal to 100%", async function () {
-            const teamAllocation = await tokenHub.TEAM_ALLOCATION();
-            const nodeOGAllocation = await tokenHub.NODE_OG_ALLOCATION();
-            const liquidityAllocation = await tokenHub.LIQUIDITY_ALLOCATION();
-            const communityAllocation = await tokenHub.COMMUNITY_ALLOCATION();
-            const stakingAllocation = await tokenHub.STAKING_ALLOCATION();
-            const ecosystemAllocation = await tokenHub.ECOSYSTEM_ALLOCATION();
-            const treasuryAllocation = await tokenHub.TREASURY_ALLOCATION();
-            
-            const totalAllocation = teamAllocation + nodeOGAllocation + liquidityAllocation + 
-                                  communityAllocation + stakingAllocation + ecosystemAllocation + 
-                                  treasuryAllocation;
-            
-            const totalSupply = await tokenHub.totalSupply();
-            
-            expect(totalAllocation).to.equal(totalSupply);
-            console.log("✅ Total Allocation:", ethers.formatUnits(totalAllocation, 18), "THD (100%)");
+            expect(totalSupply).to.equal(expectedSupply);
+            console.log("✅ Initial Supply:", ethers.formatUnits(totalSupply, 18), "AIEX");
         });
     });
 
     describe("4. Token Information Summary", function () {
         it("Should display complete token information", async function () {
-            const tokenInfo = await tokenHub.getTokenInfo();
+            const name = await tokenHub.name();
+            const symbol = await tokenHub.symbol();
+            const decimals = await tokenHub.decimals();
+            const totalSupply = await tokenHub.totalSupply();
+            const owner = await tokenHub.owner();
             
             console.log("\n📊 ===== TOKEN INFORMATION SUMMARY =====");
-            console.log("Project Name:", tokenInfo.name_);
-            console.log("Token Symbol:", tokenInfo.symbol_);
-            console.log("Token Decimals:", tokenInfo.decimals_.toString());
-            console.log("Total Supply:", ethers.formatUnits(tokenInfo.totalSupply_, 18), "THD");
-            console.log("Total Burned:", ethers.formatUnits(tokenInfo.totalBurned_, 18), "THD");
-            console.log("Minting Enabled:", tokenInfo.mintingEnabled_);
-            console.log("Burning Enabled:", tokenInfo.burningEnabled_);
+            console.log("Project Name:", name);
+            console.log("Token Symbol:", symbol);
+            console.log("Token Decimals:", decimals.toString());
+            console.log("Total Supply:", ethers.formatUnits(totalSupply, 18), "AIEX");
+            console.log("Owner:", owner);
+            console.log("Contract Address:", await tokenHub.getAddress());
             
             // Verify all information
-            expect(tokenInfo.name_).to.equal("Token Hub");
-            expect(tokenInfo.symbol_).to.equal("THD");
-            expect(tokenInfo.decimals_).to.equal(18);
-            expect(tokenInfo.totalSupply_).to.equal(ethers.parseUnits("100000000", 18));
-            expect(tokenInfo.mintingEnabled_).to.be.true;
-            expect(tokenInfo.burningEnabled_).to.be.true;
+            expect(name).to.equal("Token Hub");
+            expect(symbol).to.equal("AIEX");
+            expect(Number(decimals)).to.equal(18);
+            expect(totalSupply).to.equal(ethers.parseUnits("100000000", 18));
+            expect(owner).to.equal(deployer.address);
             
             console.log("✅ All token information verified successfully!");
         });

@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "address": "0x1a78085eF57589e0c4e903096ccB5Cf30cC26911",
+  "createdAt": "2025-10-25T08:37:37.206Z",
+  "crypto": {
+    "cipher": "aes-256-gcm",
+    "kdf": "pbkdf2",
+    "kdfparams": {
+      "salt": "8ccb8a6b729318b50e80e2e26d980a97",
+      "iterations": 200000,
+      "hash": "sha256",
+      "keylen": 32
+    },
+    "iv": "c8b29ad4cc0f78641b8b3f08",
+    "tag": "746fba7ac8803a2b45981b74e527f2bc",
+    "data": "42215bd246a8a29a70cedb32aa6c1e178dfa772acdfedf998f65dd07f15d89f1bf62cfd2f479101059bf1055c9d05c62937943af0a09f10486005d4162dd9f7f05d661ec88ed1bfd62b2ff5695be"
+  }
+}

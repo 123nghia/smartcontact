@@ -79,7 +79,7 @@ module.exports = {
         },
 
         // BSC Mainnet (production)
-        bsc: {
+        bscMainnet: {
             url: BSC_MAINNET_RPC_URL || "https://bsc-dataseed1.bnbchain.org",
             accounts: prodAccounts,
             chainId: 56,

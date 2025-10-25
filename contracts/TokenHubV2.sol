@@ -9,7 +9,7 @@ contract TokenHubV2 is ERC20, ERC20Permit, Ownable {
     uint256 public constant INITIAL_SUPPLY = 100_000_000 * 10**18;
 
     constructor(address owner) 
-        ERC20("Token Hub", "THD") 
+        ERC20("Token Hub", "AIEX") 
         ERC20Permit("Token Hub") 
         Ownable()
     {

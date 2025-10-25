@@ -51,13 +51,13 @@ async function main() {
         console.log("✅ Tên Token:", name);
         console.log("✅ Ký hiệu (Ticker):", symbol);
         console.log("✅ Decimals:", decimals.toString());
-        console.log("✅ Tổng cung:", hre.ethers.formatUnits(totalSupply, 18), "THD");
+        console.log("✅ Tổng cung:", hre.ethers.formatUnits(totalSupply, 18), "AIEX");
         console.log("✅ Chuẩn Token: ERC-20 (Compatible with BEP-20)");
         console.log("✅ Loại Token: Utility & Governance Token");
         
         // ERC-20 Compliance Test
         const balance = await tokenHub.balanceOf(tester.address);
-        console.log("✅ ERC-20 Compliance: Balance =", hre.ethers.formatUnits(balance, 18), "THD");
+        console.log("✅ ERC-20 Compliance: Balance =", hre.ethers.formatUnits(balance, 18), "AIEX");
         
     } catch (error) {
         console.log("❌ Error testing token info:", error.message);
@@ -84,19 +84,19 @@ async function main() {
         const ecosystemPercentage = (ecosystemAllocation * 100n) / totalSupply;
         const treasuryPercentage = (treasuryAllocation * 100n) / totalSupply;
         
-        console.log("👥 Team & Advisors:", hre.ethers.formatUnits(teamAllocation, 18), "THD (" + teamPercentage.toString() + "%)");
-        console.log("🌟 Node OG:", hre.ethers.formatUnits(nodeOGAllocation, 18), "THD (" + nodeOGPercentage.toString() + "%)");
-        console.log("💧 Liquidity & Market Making:", hre.ethers.formatUnits(liquidityAllocation, 18), "THD (" + liquidityPercentage.toString() + "%)");
-        console.log("🎯 Community & Marketing:", hre.ethers.formatUnits(communityAllocation, 18), "THD (" + communityPercentage.toString() + "%)");
-        console.log("🔒 Staking & Rewards:", hre.ethers.formatUnits(stakingAllocation, 18), "THD (" + stakingPercentage.toString() + "%)");
-        console.log("🌐 Ecosystem & Partnerships:", hre.ethers.formatUnits(ecosystemAllocation, 18), "THD (" + ecosystemPercentage.toString() + "%)");
-        console.log("🏦 Treasury / Reserve Fund:", hre.ethers.formatUnits(treasuryAllocation, 18), "THD (" + treasuryPercentage.toString() + "%)");
+        console.log("👥 Team & Advisors:", hre.ethers.formatUnits(teamAllocation, 18), "AIEX (" + teamPercentage.toString() + "%)");
+        console.log("🌟 Node OG:", hre.ethers.formatUnits(nodeOGAllocation, 18), "AIEX (" + nodeOGPercentage.toString() + "%)");
+        console.log("💧 Liquidity & Market Making:", hre.ethers.formatUnits(liquidityAllocation, 18), "AIEX (" + liquidityPercentage.toString() + "%)");
+        console.log("🎯 Community & Marketing:", hre.ethers.formatUnits(communityAllocation, 18), "AIEX (" + communityPercentage.toString() + "%)");
+        console.log("🔒 Staking & Rewards:", hre.ethers.formatUnits(stakingAllocation, 18), "AIEX (" + stakingPercentage.toString() + "%)");
+        console.log("🌐 Ecosystem & Partnerships:", hre.ethers.formatUnits(ecosystemAllocation, 18), "AIEX (" + ecosystemPercentage.toString() + "%)");
+        console.log("🏦 Treasury / Reserve Fund:", hre.ethers.formatUnits(treasuryAllocation, 18), "AIEX (" + treasuryPercentage.toString() + "%)");
         
         const totalAllocation = teamAllocation + nodeOGAllocation + liquidityAllocation + 
                               communityAllocation + stakingAllocation + ecosystemAllocation + 
                               treasuryAllocation;
         const totalPercentage = (totalAllocation * 100n) / totalSupply;
-        console.log("📊 TỔNG CỘNG:", hre.ethers.formatUnits(totalAllocation, 18), "THD (" + totalPercentage.toString() + "%)");
+        console.log("📊 TỔNG CỘNG:", hre.ethers.formatUnits(totalAllocation, 18), "AIEX (" + totalPercentage.toString() + "%)");
         
     } catch (error) {
         console.log("❌ Error testing allocation:", error.message);
@@ -116,49 +116,49 @@ async function main() {
         
         console.log("📋 Vesting Schedule Details:");
         console.log("👥 Team & Advisors: 0% TGE, Cliff 6 tháng, Vesting 36 tháng");
-        console.log("   - TGE Release: 0 THD (0%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(teamAllocation, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(teamAllocation / 36n, 18), "THD/tháng");
+        console.log("   - TGE Release: 0 AIEX (0%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(teamAllocation, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(teamAllocation / 36n, 18), "AIEX/tháng");
         
         console.log("🌟 Node OG: 10% TGE, Vesting 24 tháng");
         const tgeNodeOG = (nodeOGAllocation * 10n) / 100n;
         const vestingNodeOG = nodeOGAllocation - tgeNodeOG;
-        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeNodeOG, 18), "THD (10%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingNodeOG, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingNodeOG / 24n, 18), "THD/tháng");
+        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeNodeOG, 18), "AIEX (10%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingNodeOG, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingNodeOG / 24n, 18), "AIEX/tháng");
         
         console.log("💧 Liquidity & Market Making: 40% TGE, Vesting 12 tháng");
         const tgeLiquidity = (liquidityAllocation * 40n) / 100n;
         const vestingLiquidity = liquidityAllocation - tgeLiquidity;
-        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeLiquidity, 18), "THD (40%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingLiquidity, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingLiquidity / 12n, 18), "THD/tháng");
+        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeLiquidity, 18), "AIEX (40%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingLiquidity, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingLiquidity / 12n, 18), "AIEX/tháng");
         
         console.log("🎯 Community & Marketing: 20% TGE, Vesting 24 tháng");
         const tgeCommunity = (communityAllocation * 20n) / 100n;
         const vestingCommunity = communityAllocation - tgeCommunity;
-        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeCommunity, 18), "THD (20%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingCommunity, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingCommunity / 24n, 18), "THD/tháng");
+        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeCommunity, 18), "AIEX (20%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingCommunity, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingCommunity / 24n, 18), "AIEX/tháng");
         
         console.log("🔒 Staking & Rewards: 0% TGE, Vesting 36 tháng");
-        console.log("   - TGE Release: 0 THD (0%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(stakingAllocation, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(stakingAllocation / 36n, 18), "THD/tháng");
+        console.log("   - TGE Release: 0 AIEX (0%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(stakingAllocation, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(stakingAllocation / 36n, 18), "AIEX/tháng");
         
         console.log("🌐 Ecosystem & Partnerships: 10% TGE, Vesting 30 tháng");
         const tgeEcosystem = (ecosystemAllocation * 10n) / 100n;
         const vestingEcosystem = ecosystemAllocation - tgeEcosystem;
-        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeEcosystem, 18), "THD (10%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingEcosystem, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingEcosystem / 30n, 18), "THD/tháng");
+        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeEcosystem, 18), "AIEX (10%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingEcosystem, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingEcosystem / 30n, 18), "AIEX/tháng");
         
         console.log("🏦 Treasury / Reserve Fund: 20% TGE, Vesting 48 tháng");
         const tgeTreasury = (treasuryAllocation * 20n) / 100n;
         const vestingTreasury = treasuryAllocation - tgeTreasury;
-        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeTreasury, 18), "THD (20%)");
-        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingTreasury, 18), "THD");
-        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingTreasury / 48n, 18), "THD/tháng");
+        console.log("   - TGE Release:", hre.ethers.formatUnits(tgeTreasury, 18), "AIEX (20%)");
+        console.log("   - Vesting Amount:", hre.ethers.formatUnits(vestingTreasury, 18), "AIEX");
+        console.log("   - Monthly Release: ~", hre.ethers.formatUnits(vestingTreasury / 48n, 18), "AIEX/tháng");
         
         // Calculate total TGE release
         const totalTGE = tgeNodeOG + tgeLiquidity + tgeCommunity + tgeEcosystem + tgeTreasury;
@@ -166,7 +166,7 @@ async function main() {
         const tgePercentage = (totalTGE * 100n) / totalSupply;
         
         console.log("\n📊 TGE Release Summary:");
-        console.log("📈 Total TGE Release:", hre.ethers.formatUnits(totalTGE, 18), "THD");
+        console.log("📈 Total TGE Release:", hre.ethers.formatUnits(totalTGE, 18), "AIEX");
         console.log("📈 TGE Percentage:", tgePercentage.toString() + "%");
         console.log("📈 Vesting Period: 12-48 tháng");
         console.log("📈 Longest Vesting: Treasury (48 tháng)");
@@ -187,16 +187,16 @@ async function main() {
         
         // Voting Power (based on token balance)
         const balance = await tokenHub.balanceOf(tester.address);
-        console.log("✅ Governance: Voting Power =", hre.ethers.formatUnits(balance, 18), "THD");
+        console.log("✅ Governance: Voting Power =", hre.ethers.formatUnits(balance, 18), "AIEX");
         
         // VIP Tier Benefits
         console.log("\n🎖️ VIP Tier Benefits:");
         console.log("Tier 0: 0% fee discount");
-        console.log("Tier 1: 5% fee discount (10K THD)");
-        console.log("Tier 2: 10% fee discount (50K THD)");
-        console.log("Tier 3: 15% fee discount (100K THD)");
-        console.log("Tier 4: 25% fee discount (500K THD)");
-        console.log("Tier 5: 50% fee discount (1M THD)");
+        console.log("Tier 1: 5% fee discount (10K AIEX)");
+        console.log("Tier 2: 10% fee discount (50K AIEX)");
+        console.log("Tier 3: 15% fee discount (100K AIEX)");
+        console.log("Tier 4: 25% fee discount (500K AIEX)");
+        console.log("Tier 5: 50% fee discount (1M AIEX)");
         
     } catch (error) {
         console.log("❌ Error testing utility features:", error.message);
@@ -210,8 +210,8 @@ async function main() {
         console.log("Name:", tokenInfo.name_);
         console.log("Symbol:", tokenInfo.symbol_);
         console.log("Decimals:", tokenInfo.decimals_.toString());
-        console.log("Total Supply:", hre.ethers.formatUnits(tokenInfo.totalSupply_, 18), "THD");
-        console.log("Total Burned:", hre.ethers.formatUnits(tokenInfo.totalBurned_, 18), "THD");
+        console.log("Total Supply:", hre.ethers.formatUnits(tokenInfo.totalSupply_, 18), "AIEX");
+        console.log("Total Burned:", hre.ethers.formatUnits(tokenInfo.totalBurned_, 18), "AIEX");
         console.log("Minting Enabled:", tokenInfo.mintingEnabled_);
         console.log("Burning Enabled:", tokenInfo.burningEnabled_);
         
@@ -232,7 +232,7 @@ async function main() {
         
         // Check against tokenomics document
         const projectNameCorrect = name === "Token Hub";
-        const tokenSymbolCorrect = symbol === "THD";
+        const tokenSymbolCorrect = symbol === "AIEX";
         const decimalsCorrect = Number(decimals) === 18;
         const totalSupplyCorrect = totalSupply === hre.ethers.parseUnits("100000000", 18);
         const networkCorrect = [97, 31337].includes(Number(network.chainId));
@@ -293,8 +293,8 @@ async function main() {
         console.log("✅ Network: BSC Testnet (Chain ID: 97)");
     }
     
-    console.log("✅ Token: Token Hub (THD)");
-    console.log("✅ Total Supply: 100,000,000 THD");
+    console.log("✅ Token: Token Hub (AIEX)");
+    console.log("✅ Total Supply: 100,000,000 AIEX");
     console.log("✅ Features: Utility & Governance Token");
     console.log("✅ Standard: ERC-20 (BEP-20 Compatible)");
     console.log("✅ Vesting: 16.8% TGE, 83.2% Vesting");

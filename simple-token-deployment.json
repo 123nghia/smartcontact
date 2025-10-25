@@ -1,13 +1,13 @@
 {
-  "contractAddress": "0x5A6d5C13dE0AeC7d3640Eef12b7F81E37Dcb08b0",
+  "contractAddress": "0x1b889A00cB79FB693f79138dBE3eA7bA0E0bb86c",
   "deployer": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
   "owner": "0x4F4e3277b4A78a7CAd1bCBc31e7D0b948C4F87D1",
   "network": "bscTestnet",
   "chainId": "97",
-  "deploymentTime": "2025-10-23T08:52:42.941Z",
+  "deploymentTime": "2025-10-25T08:54:42.758Z",
   "tokenInfo": {
     "name": "Token Hub",
-    "symbol": "THD",
+    "symbol": "AIEX",
     "decimals": "18",
     "totalSupply": "100000000.0",
     "initialSupply": "100000000.0"

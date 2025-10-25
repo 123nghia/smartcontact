@@ -93,23 +93,23 @@ npx hardhat run scripts/deploy-tokenhub-v2.js --network bscTestnet
 
 📊 Token Information:
    Name: Token Hub
-   Symbol: THD
+   Symbol: AIEX
    Decimals: 18
-   Total Supply: 100000000.0 THD
-   Total Burned: 0.0 THD
+   Total Supply: 100000000.0 AIEX
+   Total Burned: 0.0 AIEX
    Minting Enabled: true
    Burning Enabled: true
 
 🧪 Testing Basic Functions:
    🪙 Testing mint function...
-   ✅ Minted 1000 THD
+   ✅ Minted 1000 AIEX
    👑 Testing VIP tier system...
    ✅ VIP Tier: 5
    ✅ Fee Discount: 0 %
 
 📈 Final Statistics:
-   Total Supply: 100001000.0 THD
-   Total Burned: 0.0 THD
+   Total Supply: 100001000.0 AIEX
+   Total Burned: 0.0 AIEX
 
 🎉 TokenHub V2 Deployment Completed Successfully!
    Modular architecture with separate modules
@@ -159,14 +159,14 @@ smartfolder3/
 - **Trade Mining**: Trading activity rewards
 
 ### Token Allocation
-- **Total Supply**: 100,000,000 THD
-- **Team & Advisors**: 7% (7,000,000 THD)
-- **Node OG**: 3% (3,000,000 THD)
-- **Liquidity & Market Making**: 15% (15,000,000 THD)
-- **Community & Marketing**: 20% (20,000,000 THD)
-- **Staking & Rewards**: 10% (10,000,000 THD)
-- **Ecosystem & Partnerships**: 25% (25,000,000 THD)
-- **Treasury / Reserve Fund**: 20% (20,000,000 THD)
+- **Total Supply**: 100,000,000 AIEX
+- **Team & Advisors**: 7% (7,000,000 AIEX)
+- **Node OG**: 3% (3,000,000 AIEX)
+- **Liquidity & Market Making**: 15% (15,000,000 AIEX)
+- **Community & Marketing**: 20% (20,000,000 AIEX)
+- **Staking & Rewards**: 10% (10,000,000 AIEX)
+- **Ecosystem & Partnerships**: 25% (25,000,000 AIEX)
+- **Treasury / Reserve Fund**: 20% (20,000,000 AIEX)
 
 ## 🔐 Security Features
 
